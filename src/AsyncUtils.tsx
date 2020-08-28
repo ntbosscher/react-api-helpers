@@ -10,14 +10,18 @@ export function useAsync<T>(
   fx: () => Promise<T | ErrResponse>,
   options?: { withoutAuth: boolean },
 ): {
-  loadingOrError: boolean;
   loading: boolean;
   error: string | null;
-  result: T | null;
   reload: () => void;
   LoadingElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
-} {
+} & ({
+  loadingOrError: true;
+  result: T | null;
+} | {
+  loadingOrError: false;
+  result: T;
+}) {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -28,8 +32,8 @@ export function useAsync<T>(
       setError(null);
       setLoading(true);
       setIsInit(true);
-      const result = await fx();
-      if (typeof result === 'object' && 'error' in result) throw new Error(result.error);
+      const result = await addDevelopmentDelay(fx());
+      if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
       setValue(result);
     } catch (e) {
       setError(e.toString());
@@ -61,7 +65,7 @@ export function useAsync<T>(
     loadingOrError: loading || error !== null,
     loading,
     error,
-    result: value,
+    result: value as T,
     reload,
   };
 }
@@ -108,7 +112,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       setError(null);
       setLoading(true);
 
-      const actionResult = await callback(arg);
+      const actionResult = await addDevelopmentDelay(callback(arg));
       if (actionResult && typeof actionResult === 'object' && 'error' in actionResult) {
         throw new Error((actionResult as any).error);
       }
@@ -126,4 +130,27 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const LoadingElement = LoadingEl(loading, error);
 
   return { LoadingElement, loading, error, callback: theCallback, result };
+}
+
+async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
+  const isLocalHost = window.location.hostname === "localhost";
+  if(!isLocalHost) {
+    return p;
+  }
+
+  const start = new Date().getTime();
+  const result = await p;
+
+  const spent = new Date().getTime() - start;
+  await sleep(300 * Math.random() - spent);
+
+  return result;
+}
+
+export async function sleep(ms: number) {
+  if(ms <= 0) return;
+
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  })
 }
