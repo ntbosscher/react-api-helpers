@@ -139,12 +139,15 @@ async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
   }
 
   const start = new Date().getTime();
-  const result = await p;
-
-  const spent = new Date().getTime() - start;
-  await sleep(300 * Math.random() - spent);
-
-  return result;
+  try {
+    const result = await p;
+    const spent = new Date().getTime() - start;
+    await sleep(200 * Math.random() + 100 - spent);
+    return result;
+  } catch (e) {
+    await sleep(200 * Math.random() + 100);
+    throw e;
+  }
 }
 
 export async function sleep(ms: number) {
