@@ -29,7 +29,7 @@ export class Fetcher {
     window.location = path;
   }
 
-  async postFormData<T>(path: string, body: { [k: string]: string | Blob }): Promise<T | ErrResponse> {
+  async postFormData<T>(path: string, body: { [k: string]: string | Blob }): Promise<T> {
     path = this.updatePath(path);
 
     const fd = new FormData();
@@ -48,7 +48,7 @@ export class Fetcher {
     return this.handleResponse<T>(result);
   }
 
-  async post<T>(path: string, body: any): Promise<T | ErrResponse> {
+  async post<T>(path: string, body: any): Promise<T> {
     path = this.updatePath(path);
 
     const result = await fetch(path, {
@@ -62,7 +62,7 @@ export class Fetcher {
     return this.handleResponse<T>(result);
   }
 
-  async put<T>(path: string, body: any): Promise<T | ErrResponse> {
+  async put<T>(path: string, body: any): Promise<T> {
     path = this.updatePath(path);
 
     const result = await fetch(path, {
@@ -76,7 +76,7 @@ export class Fetcher {
     return this.handleResponse<T>(result);
   }
 
-  async get<T>(path: string, urlParameters?: ParsedUrlQueryInput): Promise<T | ErrResponse> {
+  async get<T>(path: string, urlParameters?: ParsedUrlQueryInput): Promise<T> {
     path = this.updatePath(path);
 
     if (urlParameters) {
@@ -93,7 +93,7 @@ export class Fetcher {
     return this.handleResponse<T>(result);
   }
 
-  async handleResponse<T>(result: Response): Promise<T | ErrResponse> {
+  async handleResponse<T>(result: Response): Promise<T> {
     const contentType = result.headers.get('Content-Type');
     if (contentType && contentType.indexOf('json') === -1) {
       if (result.status === 404) {
@@ -109,6 +109,10 @@ export class Fetcher {
 
     if (!result.ok) {
       throw new Error(jsonData);
+    }
+
+    if("error" in jsonData) {
+      throw new Error(jsonData.error);
     }
 
     return jsonData as T;
