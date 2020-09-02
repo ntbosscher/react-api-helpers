@@ -6,10 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuthenticated } from './Auth';
 
-export function useAsync<T>(
-  fx: () => Promise<T | ErrResponse>,
-  options?: { withoutAuth: boolean },
-): {
+export type AsyncResult<T> = {
   loading: boolean;
   error: string | null;
   reload: () => void;
@@ -25,7 +22,9 @@ export function useAsync<T>(
       loadingOrError: false;
       result: T;
     }
-) {
+);
+
+export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { withoutAuth: boolean }): AsyncResult<T> {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
