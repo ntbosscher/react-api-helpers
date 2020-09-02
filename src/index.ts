@@ -6,3 +6,4 @@ export * from './Fetcher';
 export * from './Loading';
 export * from './LoadableButton';
 export * from './ListAndDetailViewEditor';
+export * from './Currency';
