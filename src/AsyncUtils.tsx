@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuthenticated } from './Auth';
 
+type DefaultLister<T> = T extends Array<any> ? {asList: T extends (infer U)[] ? U[] : never} : {asList: never};
+
 export type AsyncResult<T> = {
   loading: boolean;
   error: string | null;
@@ -13,7 +15,7 @@ export type AsyncResult<T> = {
   LoadingElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
   NoResultElement: JSX.Element | null;
-} & (
+} & DefaultLister<T> & (
   | {
       loadingOrError: true;
       result: T | null;
@@ -71,6 +73,7 @@ export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { with
     loading,
     error,
     result: value as T,
+    asList: value || [] as any,
     reload,
   };
 }
