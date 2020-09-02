@@ -4,9 +4,9 @@ import moment from 'moment';
 
 export class Fetcher {
   defaultHeaders: Headers;
-  on401: () => void;
+  on401: (retry: () => Promise<any>) => Promise<any>;
 
-  constructor(on401: () => void) {
+  constructor(on401: (retry: () => Promise<any>) => Promise<any>) {
     this.on401 = on401;
     this.defaultHeaders = new Headers({
       accept: 'application/json',
@@ -45,7 +45,7 @@ export class Fetcher {
       body: fd,
     });
 
-    return this.handleResponse<T>(result);
+    return this.handleResponse<T>(result, () => this.postFormData(path, body));
   }
 
   async post<T>(path: string, body: any): Promise<T> {
@@ -59,7 +59,7 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result);
+    return this.handleResponse<T>(result, () => this.post(path, body));
   }
 
   async put<T>(path: string, body: any): Promise<T> {
@@ -73,7 +73,7 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result);
+    return this.handleResponse<T>(result, () => this.put(path, body));
   }
 
   async get<T>(path: string, urlParameters?: ParsedUrlQueryInput): Promise<T> {
@@ -90,10 +90,10 @@ export class Fetcher {
       cache: 'no-cache',
     });
 
-    return this.handleResponse<T>(result);
+    return this.handleResponse<T>(result, () => this.get(path, urlParameters));
   }
 
-  async handleResponse<T>(result: Response): Promise<T> {
+  async handleResponse<T>(result: Response, retry: () => Promise<T>): Promise<T> {
     const contentType = result.headers.get('Content-Type');
     if (contentType && contentType.indexOf('json') === -1) {
       if (result.status === 404) {
@@ -104,14 +104,14 @@ export class Fetcher {
     const jsonData = await result.json();
 
     if (result.status === 401) {
-      this.on401();
+      return this.on401(retry);
     }
 
     if (!result.ok) {
       throw new Error(jsonData);
     }
 
-    if("error" in jsonData) {
+    if(jsonData && typeof jsonData === "object" && "error" in jsonData) {
       throw new Error(jsonData.error);
     }
 

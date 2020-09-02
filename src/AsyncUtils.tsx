@@ -15,6 +15,7 @@ export function useAsync<T>(
   reload: () => void;
   LoadingElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
+  NoResultElement: JSX.Element | null;
 } & ({
   loadingOrError: true;
   result: T | null;
@@ -58,9 +59,11 @@ export function useAsync<T>(
   }, [isInit, status, load, options]);
 
   const LoadingElement = LoadingEl(loading, error, reload);
+  const NoResultElement = NoResultEl(LoadingElement, value);
 
   return {
     LoadingElement,
+    NoResultElement,
     LoadingOrErrorElement: LoadingElement,
     loadingOrError: loading || error !== null,
     loading,
@@ -99,6 +102,7 @@ export interface AsyncAction<T, U> {
   callback(input: U): void;
   result: T | null;
   LoadingElement: JSX.Element | null;
+  NoResultElement: JSX.Element | null;
 }
 
 export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dependsOn: any[]): AsyncAction<T, U> {
@@ -128,8 +132,20 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   }, depends);
 
   const LoadingElement = LoadingEl(loading, error);
+  const NoResultElement = NoResultEl(LoadingElement, result);
 
-  return { LoadingElement, loading, error, callback: theCallback, result };
+  return { LoadingElement, loading, error, callback: theCallback, result, NoResultElement };
+}
+
+function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
+  if(LoadingElement === null) {
+    const isBlankArray = result instanceof Array && result.length === 0;
+    if(result === null || isBlankArray) {
+      return <Typography style={{padding: 16}} variant="body2" color="textSecondary">Nothing here</Typography>
+    }
+  }
+
+  return null;
 }
 
 async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
