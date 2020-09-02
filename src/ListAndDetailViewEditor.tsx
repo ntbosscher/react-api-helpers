@@ -73,7 +73,7 @@ export function ListAndDetailViewEditor<T>(props: {
                     <ListItemText>{props.displayName(c)}</ListItemText>
                   </ListItem>
                 ))}
-                {props.list.result && list.length === 0 && (
+                {props.list.NoResultElement === null && props.list.result && list.length === 0 && (
                   <Typography variant="body2" color="textSecondary" style={{ textAlign: 'center' }}>
                     Nothing matches that search
                   </Typography>
