@@ -18,8 +18,8 @@ export function parseCents(str: string): number {
     cents = parseInt(parts[1].substring(0, 2).padEnd(2, '0'), 10);
   }
 
-  if(isNaN(dollars)) dollars = 0;
-  if(isNaN(cents)) cents = 0;
+  if (isNaN(dollars)) dollars = 0;
+  if (isNaN(cents)) cents = 0;
 
   return Math.round(dollars * 100 + cents);
 }
