@@ -111,7 +111,7 @@ export class Fetcher {
       throw new Error(jsonData);
     }
 
-    if(jsonData && typeof jsonData === "object" && "error" in jsonData) {
+    if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
       throw new Error(jsonData.error);
     }
 

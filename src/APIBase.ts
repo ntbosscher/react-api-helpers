@@ -6,18 +6,19 @@ export class APIBase {
 
   constructor(options?: APIBaseOptions) {
     this.fetcher = new Fetcher(async (retry: () => Promise<any>) => {
-
-      if(options?.jwtRefreshEndpoint) {
+      if (options?.jwtRefreshEndpoint) {
         await this.fetcher.post(options.jwtRefreshEndpoint, {});
         return retry();
       }
 
       notAuthorizedResponse.emit(null);
-      throw new Error("Access Denied");
+      throw new Error('Access Denied');
     });
   }
 }
 
-export interface APIBaseOptions {jwtRefreshEndpoint: string}
+export interface APIBaseOptions {
+  jwtRefreshEndpoint: string;
+}
 
 export const notAuthorizedResponse = new EventEmitter();

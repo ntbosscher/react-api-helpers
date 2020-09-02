@@ -16,13 +16,16 @@ export function useAsync<T>(
   LoadingElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
   NoResultElement: JSX.Element | null;
-} & ({
-  loadingOrError: true;
-  result: T | null;
-} | {
-  loadingOrError: false;
-  result: T;
-}) {
+} & (
+  | {
+      loadingOrError: true;
+      result: T | null;
+    }
+  | {
+      loadingOrError: false;
+      result: T;
+    }
+) {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -138,10 +141,14 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
 }
 
 function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
-  if(LoadingElement === null) {
+  if (LoadingElement === null) {
     const isBlankArray = result instanceof Array && result.length === 0;
-    if(result === null || isBlankArray) {
-      return <Typography style={{padding: 16}} variant="body2" color="textSecondary">Nothing here</Typography>
+    if (result === null || isBlankArray) {
+      return (
+        <Typography style={{ padding: 16 }} variant="body2" color="textSecondary">
+          Nothing here
+        </Typography>
+      );
     }
   }
 
@@ -149,8 +156,8 @@ function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
 }
 
 async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
-  const isLocalHost = window.location.hostname === "localhost";
-  if(!isLocalHost) {
+  const isLocalHost = window.location.hostname === 'localhost';
+  if (!isLocalHost) {
     return p;
   }
 
@@ -167,9 +174,9 @@ async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
 }
 
 export async function sleep(ms: number) {
-  if(ms <= 0) return;
+  if (ms <= 0) return;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms);
-  })
+  });
 }
