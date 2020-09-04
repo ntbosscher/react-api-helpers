@@ -7,8 +7,12 @@ export class APIBase {
   constructor(options?: APIBaseOptions) {
     this.fetcher = new Fetcher(async (retry: () => Promise<any>) => {
       if (options?.jwtRefreshEndpoint) {
-        await this.fetcher.post(options.jwtRefreshEndpoint, {});
-        return retry();
+        try {
+          await this.fetcher.postForAuth(options.jwtRefreshEndpoint, {});
+          return retry();
+        } catch (e) {
+          // continue to access-denied
+        }
       }
 
       notAuthorizedResponse.emit(null);

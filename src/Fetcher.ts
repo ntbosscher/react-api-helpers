@@ -48,6 +48,20 @@ export class Fetcher {
     return this.handleResponse<T>(result, () => this.postFormData(path, body));
   }
 
+  async postForAuth<T>(path: string, body: any): Promise<T> {
+    path = this.updatePath(path);
+
+    const result = await fetch(path, {
+      method: 'POST',
+      headers: this.defaultHeaders,
+      credentials: 'include',
+      cache: 'no-cache',
+      body: JSON.stringify(body),
+    });
+
+    return this.handleResponse<T>(result);
+  }
+
   async post<T>(path: string, body: any): Promise<T> {
     path = this.updatePath(path);
 
@@ -93,7 +107,7 @@ export class Fetcher {
     return this.handleResponse<T>(result, () => this.get(path, urlParameters));
   }
 
-  async handleResponse<T>(result: Response, retry: () => Promise<T>): Promise<T> {
+  async handleResponse<T>(result: Response, retry?: () => Promise<T>): Promise<T> {
     const contentType = result.headers.get('Content-Type');
     if (contentType && contentType.indexOf('json') === -1) {
       if (result.status === 404) {
@@ -103,7 +117,7 @@ export class Fetcher {
 
     const jsonData = await result.json();
 
-    if (result.status === 401) {
+    if (result.status === 401 && retry) {
       return this.on401(retry);
     }
 
