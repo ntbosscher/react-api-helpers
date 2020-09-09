@@ -122,12 +122,10 @@ export class Fetcher {
     }
 
     if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
-      debugger;
       throw new Error(jsonData.error);
     }
 
     if (!result.ok) {
-      debugger;
       throw new Error(jsonData);
     }
 
