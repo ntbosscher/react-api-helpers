@@ -74,10 +74,12 @@ export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { with
     loading,
     error,
     result: value as T,
-    asList: value || ([] as any),
+    asList: value || (defaultArray as any),
     reload,
   };
 }
+
+const defaultArray = [];
 
 function LoadingEl(loading: boolean, error: string | null, reload?: () => void) {
   if (loading) {

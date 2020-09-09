@@ -121,12 +121,14 @@ export class Fetcher {
       return this.on401(retry);
     }
 
-    if (!result.ok) {
-      throw new Error(jsonData);
+    if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
+      debugger;
+      throw new Error(jsonData.error);
     }
 
-    if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
-      throw new Error(jsonData.error);
+    if (!result.ok) {
+      debugger;
+      throw new Error(jsonData);
     }
 
     return jsonData as T;
