@@ -7,3 +7,4 @@ export * from './Loading';
 export * from './LoadableButton';
 export * from './ListAndDetailViewEditor';
 export * from './Currency';
+export * from './ArrayUtils';
