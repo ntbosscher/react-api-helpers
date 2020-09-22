@@ -142,7 +142,14 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const LoadingElement = LoadingEl(loading, error);
   const NoResultElement = NoResultEl(LoadingElement, result);
 
-  return { LoadingElement, loading, error, callback: theCallback as (arg: U) => Promise<void>, result, NoResultElement };
+  return {
+    LoadingElement,
+    loading,
+    error,
+    callback: theCallback as (arg: U) => Promise<void>,
+    result,
+    NoResultElement,
+  };
 }
 
 function NoResultEl(LoadingElement: JSX.Element | null, result: any) {

@@ -32,12 +32,10 @@ type Selector<T, U> = (v: T) => U;
 
 export function distinct<T, U = null>(
   input: T[],
-  selector?: Selector<T, U extends null ? T : U>
+  selector?: Selector<T, U extends null ? T : U>,
 ): (U extends null ? T : U)[] {
   if (!selector) selector = (v) => v as any;
-  return input
-    .map(selector)
-    .filter((value, index, array) => array.indexOf(value) === index);
+  return input.map(selector).filter((value, index, array) => array.indexOf(value) === index);
 }
 
 export function betweenIncl(test: number, boundA: number, boundB: number) {
@@ -76,7 +74,7 @@ export function range(a: number, b: number | null = null): number[] {
 export function aggregate<T, K extends string>(
   list: T[],
   keySelector: (arg: T) => K,
-  aggregate: (current: T, accumulator: number) => number
+  aggregate: (current: T, accumulator: number) => number,
 ): {
   [k: string]: number;
 } {
@@ -89,14 +87,11 @@ export function aggregate<T, K extends string>(
     },
     {} as {
       [k: string]: number;
-    }
+    },
   );
 }
 
-export function aggCount<T, K extends string>(
-  list: T[],
-  keySelector: (arg: T) => K
-) {
+export function aggCount<T, K extends string>(list: T[], keySelector: (arg: T) => K) {
   return aggregate(list, keySelector, (current, acc) => 1 + acc);
 }
 
@@ -109,10 +104,7 @@ interface GroupByResult<T> {
   [k: number]: T[];
 }
 
-export function groupBy<T, K extends string | number>(
-  list: T[],
-  keySelector: (item: T) => K
-): GroupByResult<T> {
+export function groupBy<T, K extends string | number>(list: T[], keySelector: (item: T) => K): GroupByResult<T> {
   return list.reduce((accumulator, value) => {
     const key = keySelector(value);
     const arr = accumulator[key] ?? [];
@@ -130,7 +122,7 @@ interface GroupByArrResult<T, K> {
 export function groupByArr<T, K>(
   list: T[],
   keySelector: (item: T) => K,
-  compareKeyByReference: boolean = false
+  compareKeyByReference: boolean = false,
 ): GroupByArrResult<T, K>[] {
   const keys: any[] = [];
 
@@ -151,17 +143,11 @@ export function groupByArr<T, K>(
   }, [] as GroupByArrResult<T, K>[]);
 }
 
-export function orderByAscending<T>(
-  list: T[],
-  selector: (item: T) => number
-): void {
+export function orderByAscending<T>(list: T[], selector: (item: T) => number): void {
   list.sort((a, b) => selector(a) - selector(b));
 }
 
-export function orderByDescending<T>(
-  list: T[],
-  selector: (item: T) => number
-): void {
+export function orderByDescending<T>(list: T[], selector: (item: T) => number): void {
   list.sort((a, b) => selector(b) - selector(a));
 }
 
@@ -182,7 +168,7 @@ export function first<T>(items: T[], selector: (item: T) => boolean): T | null {
 }
 
 export function min<T>(items: T[], selector: (item: T) => number): T {
-  if (items.length === 0) throw new Error("no items in list");
+  if (items.length === 0) throw new Error('no items in list');
 
   let minIndex = 0;
   let minValue = Infinity;
@@ -214,7 +200,7 @@ export function all<T>(items: T[], selector: (item: T) => boolean): boolean {
 }
 
 export function max<T>(items: T[], selector: (item: T) => number): T {
-  if (items.length === 0) throw new Error("no items in list");
+  if (items.length === 0) throw new Error('no items in list');
 
   let maxIndex = 0;
   let maxValue = -Infinity;
@@ -235,9 +221,7 @@ export function max<T>(items: T[], selector: (item: T) => number): T {
 
 export function splitNWays<T>(elements: T[], n: number): T[][] {
   if (elements.length < n) {
-    throw new Error(
-      "can't split a list of " + elements.length + " elements " + n + " ways"
-    );
+    throw new Error("can't split a list of " + elements.length + ' elements ' + n + ' ways');
   }
 
   let position = 0;
