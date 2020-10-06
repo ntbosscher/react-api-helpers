@@ -27,7 +27,10 @@ export type AsyncResult<T> = {
       }
   );
 
-export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { withoutAuth: boolean, dependsOn?: any[] }): AsyncResult<T> {
+export function useAsync<T>(
+  fx: () => Promise<T | ErrResponse>,
+  options?: { withoutAuth: boolean; dependsOn?: any[] },
+): AsyncResult<T> {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
