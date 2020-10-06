@@ -27,18 +27,20 @@ export type AsyncResult<T> = {
       }
   );
 
-export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { withoutAuth: boolean }): AsyncResult<T> {
+export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { withoutAuth: boolean, dependsOn?: any[] }): AsyncResult<T> {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isInit, setIsInit] = useState(false);
+
+  const cb = options?.dependsOn ? useCallback(fx, options?.dependsOn) : fx;
 
   const load = useCallback(async () => {
     try {
       setError(null);
       setLoading(true);
       setIsInit(true);
-      const result = await addDevelopmentDelay(fx());
+      const result = await addDevelopmentDelay(cb());
       if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
       setValue(result);
     } catch (e) {
@@ -46,9 +48,9 @@ export function useAsync<T>(fx: () => Promise<T | ErrResponse>, options?: { with
     }
 
     setLoading(false);
-  }, [fx]);
+  }, [cb]);
 
-  const reload = useCallback(load, [fx]);
+  const reload = useCallback(load, [cb]);
   const status = useAuthenticated();
 
   useEffect(() => {
