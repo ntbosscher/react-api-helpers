@@ -27,10 +27,13 @@ export type AsyncResult<T> = {
       }
   );
 
-type CallbackWithInput<T,I> = (input?: I) => Promise<T | ErrResponse>;
+type CallbackWithInput<T, I> = (input?: I) => Promise<T | ErrResponse>;
 type CallbackWithoutInput<T> = () => Promise<T | ErrResponse>;
 
-export function useAsync<T, I>(fx: CallbackWithInput<T, I>, options?: { withoutAuth: boolean; dependsOn?: any[] }): AsyncResult<T> & { reload(input: I): void };
+export function useAsync<T, I>(
+  fx: CallbackWithInput<T, I>,
+  options?: { withoutAuth: boolean; dependsOn?: any[] },
+): AsyncResult<T> & { reload(input: I): void };
 export function useAsync<T, I>(
   fx: CallbackWithoutInput<T>,
   options?: { withoutAuth: boolean; dependsOn?: any[] },
@@ -42,21 +45,24 @@ export function useAsync<T, I>(
 
   const cb = options?.dependsOn ? useCallback(fx, options?.dependsOn) : fx;
 
-  const load = useCallback(async (input?: any) => {
-    try {
-      setError(null);
-      setLoading(true);
-      setIsInit(true);
-      // @ts-ignore
-      const result = await addDevelopmentDelay(cb(input));
-      if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
-      setValue(result);
-    } catch (e) {
-      setError(e.toString());
-    }
+  const load = useCallback(
+    async (input?: any) => {
+      try {
+        setError(null);
+        setLoading(true);
+        setIsInit(true);
+        // @ts-ignore
+        const result = await addDevelopmentDelay(cb(input));
+        if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
+        setValue(result);
+      } catch (e) {
+        setError(e.toString());
+      }
 
-    setLoading(false);
-  }, [cb]);
+      setLoading(false);
+    },
+    [cb],
+  );
 
   const reload = useCallback(load, [cb]);
   const status = useAuthenticated();
