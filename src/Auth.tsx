@@ -14,9 +14,22 @@ const AuthContext = createContext<Auth>({
   },
 });
 
-export function AuthProvider(props: PropsWithChildren<{}>) {
+export function AuthProvider(
+  props: PropsWithChildren<{
+    onPing?: () => any;
+    pingInterval?: number; // default: every 30 sec
+  }>,
+) {
   const [authenticated, setAuthenticated] = useState(true);
   const ctx = useMemo(() => ({ authenticated, setAuthenticated }), [authenticated, setAuthenticated]);
+
+  let { onPing, pingInterval } = props;
+
+  useEffect(() => {
+    if (!onPing) return;
+    const checker = setInterval(onPing, pingInterval || 30 * 1000);
+    return () => clearInterval(checker);
+  }, [onPing, pingInterval]);
 
   useEffect(() => {
     const sub = notAuthorizedResponse.subscribe(() => {
