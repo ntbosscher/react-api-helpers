@@ -30,7 +30,11 @@ export function AuthProvider(
   useEffect(() => {
     if (!onPing) return;
     const ping = onPing;
-    const checker = setInterval(async () => setLastPingResult(await ping()), pingInterval || 30 * 1000);
+
+    const check = async () => setLastPingResult(await ping());
+    check(); // trigger check now b/c setInterval will wait for the first interval to elapse
+
+    const checker = setInterval(check, pingInterval || 30 * 1000);
     return () => clearInterval(checker);
   }, [onPing, pingInterval]);
 
