@@ -97,7 +97,7 @@ export function useAsync<T, I>(
 
 const defaultArray = [];
 
-function LoadingEl(loading: boolean, error: string | null, reload?: () => void) {
+export function LoadingEl(loading: boolean, error: string | null, reload?: () => void) {
   if (loading) {
     return <Loading />;
   }
