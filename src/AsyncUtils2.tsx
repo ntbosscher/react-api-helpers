@@ -17,12 +17,17 @@ export function AsyncCacheProvider(props: PropsWithChildren<{}>) {
   return <ReactQueryCacheProvider queryCache={queryCache}>{props.children}</ReactQueryCacheProvider>;
 }
 
-export function useAsyncPaginated<TResult, TError extends Error, TArgs extends TypedQueryFunctionArgs>(
+export function useAsyncPaginated<
+  TResult extends Array<any>,
+  TError extends Error,
+  TArgs extends TypedQueryFunctionArgs
+>(
   queryKey: QueryKey,
   queryFn: TypedQueryFunction<TResult, TArgs>,
   queryConfig?: PaginatedQueryConfig<TResult, TError>,
 ): PaginatedQueryResult<TResult, TError> & {
   autoShow: (dataView: JSX.Element) => JSX.Element;
+  list: TResult;
   LoadingOrError: JSX.Element | null;
 } {
   const result = usePaginatedQuery(queryKey, queryFn, queryConfig);
@@ -33,6 +38,7 @@ export function useAsyncPaginated<TResult, TError extends Error, TArgs extends T
 
   return {
     ...result,
+    list: result.resolvedData || ([] as any),
     autoShow: loading === null ? (value: JSX.Element) => value : (dataView: JSX.Element) => loading,
     LoadingOrError: loading,
   };
