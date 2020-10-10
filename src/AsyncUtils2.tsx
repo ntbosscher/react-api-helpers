@@ -37,7 +37,7 @@ export function useAsyncPaginated<
       : null;
 
   const renderer = (value: JSX.Element, noDataView?: JSX.Element) => {
-    if(noDataView && result.resolvedData instanceof Array && result.resolvedData.length === 0) return noDataView;
+    if (noDataView && result.resolvedData instanceof Array && result.resolvedData.length === 0) return noDataView;
     return value;
   };
 
