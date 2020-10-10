@@ -36,14 +36,16 @@ export function useAsyncPaginated<
       ? LoadingEl(result.isLoading, result.error?.message as string, () => result.refetch())
       : null;
 
+  const list = result.resolvedData || ([] as any);
+
   const renderer = (value: JSX.Element, noDataView?: JSX.Element) => {
-    if (noDataView && result.resolvedData instanceof Array && result.resolvedData.length === 0) return noDataView;
+    if (noDataView && list instanceof Array && list.length === 0) return noDataView;
     return value;
   };
 
   return {
     ...result,
-    list: result.resolvedData || ([] as any),
+    list: list,
     autoShow: loading === null ? renderer : (dataView: JSX.Element) => loading,
     LoadingOrError: loading,
   };
