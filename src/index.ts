@@ -9,4 +9,4 @@ export * from './LoadableButton';
 export * from './ListAndDetailViewEditor';
 export * from './Currency';
 export * from './ArrayUtils';
-export * from "./SelectWithLabel"
+export * from './SelectWithLabel';
