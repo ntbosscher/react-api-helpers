@@ -26,7 +26,7 @@ export function useAsyncPaginated<
   queryFn: TypedQueryFunction<TResult, TArgs>,
   queryConfig?: PaginatedQueryConfig<TResult, TError>,
 ): PaginatedQueryResult<TResult, TError> & {
-  autoShow: (dataView: JSX.Element) => JSX.Element;
+  autoShow: (dataView: JSX.Element, noDataView?: JSX.Element) => JSX.Element;
   list: TResult;
   LoadingOrError: JSX.Element | null;
 } {
@@ -36,10 +36,15 @@ export function useAsyncPaginated<
       ? LoadingEl(result.isLoading, result.error?.message as string, () => result.refetch())
       : null;
 
+  const renderer = (value: JSX.Element, noDataView?: JSX.Element) => {
+    if(noDataView && result.resolvedData instanceof Array && result.resolvedData.length === 0) return noDataView;
+    return value;
+  };
+
   return {
     ...result,
     list: result.resolvedData || ([] as any),
-    autoShow: loading === null ? (value: JSX.Element) => value : (dataView: JSX.Element) => loading,
+    autoShow: loading === null ? renderer : (dataView: JSX.Element) => loading,
     LoadingOrError: loading,
   };
 }
