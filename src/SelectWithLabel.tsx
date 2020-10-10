@@ -1,9 +1,4 @@
-import React, {
-  CSSProperties,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from 'react';
+import React, { CSSProperties, PropsWithChildren, useEffect, useState } from 'react';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
@@ -15,9 +10,9 @@ export function SelectWithLabel(
     style?: CSSProperties;
     value?: any;
     label: string;
-    variant?: 'standard' | 'outlined' | 'filled',
+    variant?: 'standard' | 'outlined' | 'filled';
     onChange?(value: string): void;
-  }>
+  }>,
 ) {
   const [labelId, setLabelId] = useState<string>();
   useEffect(() => {
