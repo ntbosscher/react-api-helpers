@@ -247,3 +247,23 @@ export function dedupe<T>(list: T[]): T[] {
     return true;
   });
 }
+
+export function distinctByKey<T>(value: T[], keySelector: (value: T) => string): T[] {
+  const keys: string[] = [];
+  const out: T[] = [];
+
+  for(let v of value) {
+    const key = keySelector(v);
+    if(keys.indexOf(key) !== -1) continue;
+    keys.push(key);
+    out.push(v);
+  }
+
+  return out;
+}
+
+export function stringDiff(a: string, b: string): number {
+  if(a === b) return 0;
+  if(a > b) return -1;
+  return 1;
+}
