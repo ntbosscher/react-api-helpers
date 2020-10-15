@@ -252,9 +252,9 @@ export function distinctByKey<T>(value: T[], keySelector: (value: T) => string):
   const keys: string[] = [];
   const out: T[] = [];
 
-  for(let v of value) {
+  for (let v of value) {
     const key = keySelector(v);
-    if(keys.indexOf(key) !== -1) continue;
+    if (keys.indexOf(key) !== -1) continue;
     keys.push(key);
     out.push(v);
   }
@@ -263,7 +263,7 @@ export function distinctByKey<T>(value: T[], keySelector: (value: T) => string):
 }
 
 export function stringDiff(a: string, b: string): number {
-  if(a === b) return 0;
-  if(a > b) return -1;
+  if (a === b) return 0;
+  if (a > b) return -1;
   return 1;
 }
