@@ -29,7 +29,7 @@ export class Fetcher {
     window.location = path;
   }
 
-  async postFormData<T>(path: string, body: { [k: string]: string | Blob }): Promise<T> {
+  async postFormData<T>(path: string, body: { [k: string]: string | Blob }, isRetry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
     const fd = new FormData();
@@ -45,7 +45,7 @@ export class Fetcher {
       body: fd,
     });
 
-    return this.handleResponse<T>(result, () => this.postFormData(path, body));
+    return this.handleResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
 
   async postForAuth<T>(path: string, body: any): Promise<T> {
@@ -62,7 +62,7 @@ export class Fetcher {
     return this.handleResponse<T>(result);
   }
 
-  async post<T>(path: string, body: any): Promise<T> {
+  async post<T>(path: string, body: any, isRetry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
     const result = await fetch(path, {
@@ -73,10 +73,10 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result, () => this.post(path, body));
+    return this.handleResponse<T>(result, () => this.post(path, body, true), isRetry);
   }
 
-  async put<T>(path: string, body: any): Promise<T> {
+  async put<T>(path: string, body: any, retry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
     const result = await fetch(path, {
@@ -87,10 +87,10 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result, () => this.put(path, body));
+    return this.handleResponse<T>(result, () => this.put(path, body, true), retry);
   }
 
-  async get<T>(path: string, urlParameters?: ParsedUrlQueryInput): Promise<T> {
+  async get<T>(path: string, urlParameters?: ParsedUrlQueryInput, isRetry = false): Promise<T> {
     path = this.updatePath(path);
 
     if (urlParameters) {
@@ -104,10 +104,10 @@ export class Fetcher {
       cache: 'no-cache',
     });
 
-    return this.handleResponse<T>(result, () => this.get(path, urlParameters));
+    return this.handleResponse<T>(result, () => this.get(path, urlParameters, true), isRetry);
   }
 
-  async handleResponse<T>(result: Response, retry?: () => Promise<T>): Promise<T> {
+  async handleResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
     const contentType = result.headers.get('Content-Type');
     if (contentType && contentType.indexOf('json') === -1) {
       if (result.status === 404) {
@@ -117,7 +117,7 @@ export class Fetcher {
 
     const jsonData = await result.json();
 
-    if (result.status === 401 && retry) {
+    if (!isRetry && result.status === 401 && retry) {
       return this.on401(retry);
     }
 
