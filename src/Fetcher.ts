@@ -93,11 +93,12 @@ export class Fetcher {
   async get<T>(path: string, urlParameters?: ParsedUrlQueryInput, isRetry = false): Promise<T> {
     path = this.updatePath(path);
 
+    let fullPath = path;
     if (urlParameters) {
-      path = path + '?' + querystring.stringify(urlParameters);
+      fullPath = path + '?' + querystring.stringify(urlParameters);
     }
 
-    const result = await fetch(path, {
+    const result = await fetch(fullPath, {
       method: 'GET',
       headers: this.defaultHeaders,
       credentials: 'include',
