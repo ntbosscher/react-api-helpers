@@ -6,14 +6,14 @@ export class Fetcher {
   defaultHeaders: Headers;
   on401: (retry: () => Promise<any>) => Promise<any>;
 
-  constructor(options: {on401: (retry: () => Promise<any>) => Promise<any>, apiVersion?: string}) {
+  constructor(options: { on401: (retry: () => Promise<any>) => Promise<any>; apiVersion?: string }) {
     this.on401 = options.on401;
     this.defaultHeaders = new Headers({
       accept: 'application/json',
     });
 
-    if(options.apiVersion) {
-      this.defaultHeaders.append("X-APIVersion", options.apiVersion);
+    if (options.apiVersion) {
+      this.defaultHeaders.append('X-APIVersion', options.apiVersion);
     }
 
     this.defaultHeaders.append('X-TimezoneOffsetMins', moment().utcOffset().toString());
