@@ -66,9 +66,10 @@ export function useAsync<T, I>(
 
   const reload = useCallback(load, [cb]);
   const status = useAuthenticated();
+  const hasDeps = !!options?.dependsOn;
 
   useEffect(() => {
-    if (isInit) return;
+    if (isInit && !hasDeps) return;
     if (!options?.withoutAuth) {
       if (!status.authenticated) {
         setError('Not authenticated');
@@ -77,7 +78,7 @@ export function useAsync<T, I>(
     }
 
     load();
-  }, [isInit, status, load, options]);
+  }, [isInit, status, load, options, hasDeps]);
 
   const LoadingElement = LoadingEl(loading, error, reload);
   const NoResultElement = NoResultEl(LoadingElement, value);
