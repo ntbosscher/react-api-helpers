@@ -9,7 +9,7 @@ import {
   TypedQueryFunctionArgs,
 } from 'react-query/types/core/types';
 import { QueryCache, ReactQueryCacheProvider } from 'react-query';
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrResponse } from './Fetcher';
 
 const queryCache = new QueryCache();
@@ -58,18 +58,15 @@ export type AsyncResult2<T> = {
   LoadingElement: JSX.Element | null;
   NoResultElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
-  loadingOrError: boolean
+  loadingOrError: boolean;
   loading: boolean;
   error: string | null;
   result: T;
   asList: T;
   reload: () => void;
-}
+};
 
-export function useAsync2<T, I>(
-  fx: CallbackWithInput2<T, I>,
-  search: I,
-): AsyncResult2<T> {
+export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I): AsyncResult2<T> {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,22 +74,19 @@ export function useAsync2<T, I>(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cb = useMemo(() => fx, []);
 
-  const reload = useCallback(
-    async () => {
-      try {
-        setError(null);
-        setLoading(true);
-        const result = await addDevelopmentDelay(cb(search));
-        if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
-        setValue(result);
-      } catch (e) {
-        setError(e.toString());
-      }
+  const reload = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const result = await addDevelopmentDelay(cb(search));
+      if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
+      setValue(result);
+    } catch (e) {
+      setError(e.toString());
+    }
 
-      setLoading(false);
-    },
-    [cb, search],
-  );
+    setLoading(false);
+  }, [cb, search]);
 
   useEffect(() => {
     reload();
@@ -109,10 +103,9 @@ export function useAsync2<T, I>(
     loading,
     error,
     result: value as T,
-    asList: value as T || (defaultArray as any as T),
+    asList: (value as T) || ((defaultArray as any) as T),
     reload,
   };
 }
-
 
 const defaultArray = [];
