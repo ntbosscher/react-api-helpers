@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { usePaginatedQuery } from 'react-query';
-import { LoadingEl } from './AsyncUtils';
+import { addDevelopmentDelay, LoadingEl, NoResultEl } from './AsyncUtils';
 import {
   PaginatedQueryConfig,
   PaginatedQueryResult,
@@ -9,7 +9,8 @@ import {
   TypedQueryFunctionArgs,
 } from 'react-query/types/core/types';
 import { QueryCache, ReactQueryCacheProvider } from 'react-query';
-import React from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from "react";
+import { ErrResponse } from './Fetcher';
 
 const queryCache = new QueryCache();
 
@@ -50,3 +51,68 @@ export function useAsyncPaginated<
     LoadingOrError: loading,
   };
 }
+
+type CallbackWithInput2<T, I> = (input: I) => Promise<T | ErrResponse>;
+
+export type AsyncResult2<T> = {
+  LoadingElement: JSX.Element | null;
+  NoResultElement: JSX.Element | null;
+  LoadingOrErrorElement: JSX.Element | null;
+  loadingOrError: boolean
+  loading: boolean;
+  error: string | null;
+  result: T;
+  asList: T;
+  reload: () => void;
+}
+
+export function useAsync2<T, I>(
+  fx: CallbackWithInput2<T, I>,
+  search: I,
+): AsyncResult2<T> {
+  const [loading, setLoading] = useState(true);
+  const [value, setValue] = useState<T | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const cb = useMemo(() => fx, []);
+
+  const reload = useCallback(
+    async () => {
+      try {
+        setError(null);
+        setLoading(true);
+        const result = await addDevelopmentDelay(cb(search));
+        if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
+        setValue(result);
+      } catch (e) {
+        setError(e.toString());
+      }
+
+      setLoading(false);
+    },
+    [cb, search],
+  );
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const LoadingElement = LoadingEl(loading, error, reload);
+  const NoResultElement = NoResultEl(LoadingElement, value);
+
+  return {
+    LoadingElement,
+    NoResultElement,
+    LoadingOrErrorElement: LoadingElement,
+    loadingOrError: loading || error !== null,
+    loading,
+    error,
+    result: value as T,
+    asList: value as T || (defaultArray as any as T),
+    reload,
+  };
+}
+
+
+const defaultArray = [];

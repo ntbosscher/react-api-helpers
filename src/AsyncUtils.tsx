@@ -169,7 +169,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   };
 }
 
-function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
+export function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
   if (LoadingElement === null) {
     const isBlankArray = result instanceof Array && result.length === 0;
     if (result === null || isBlankArray) {
@@ -184,7 +184,7 @@ function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
   return null;
 }
 
-async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
+export async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
   const isLocalHost = window.location.hostname === 'localhost';
   if (!isLocalHost) {
     return p;
