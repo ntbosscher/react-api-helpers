@@ -61,12 +61,12 @@ export type AsyncResult2<T> = {
   loadingOrError: boolean;
   loading: boolean;
   error: string | null;
-  result: T;
+  result: T | null;
   asList: T;
   reload: () => void;
 };
 
-export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I): AsyncResult2<T> {
+export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchDeps?: any[]): AsyncResult2<T> {
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,11 +74,13 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I): AsyncR
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cb = useMemo(() => fx, []);
 
+  const memoizedSearch = useMemo(() => search, searchDeps || [search]);
+
   const reload = useCallback(async () => {
     try {
       setError(null);
       setLoading(true);
-      const result = await addDevelopmentDelay(cb(search));
+      const result = await addDevelopmentDelay(cb(memoizedSearch));
       if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
       setValue(result);
     } catch (e) {
@@ -86,7 +88,7 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I): AsyncR
     }
 
     setLoading(false);
-  }, [cb, search]);
+  }, [cb, memoizedSearch]);
 
   useEffect(() => {
     reload();
@@ -102,7 +104,7 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I): AsyncR
     loadingOrError: loading || error !== null,
     loading,
     error,
-    result: value as T,
+    result: value,
     asList: (value as T) || ((defaultArray as any) as T),
     reload,
   };
