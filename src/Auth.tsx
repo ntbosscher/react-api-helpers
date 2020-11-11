@@ -32,8 +32,8 @@ export function AuthProvider(
   let { onPing, pingInterval } = props;
 
   const check = useCallback(async () => {
-    if(!onPing) return;
-    setLastPingResult(await onPing())
+    if (!onPing) return;
+    setLastPingResult(await onPing());
   }, [onPing]);
 
   useEffect(() => {
