@@ -1,16 +1,20 @@
 import * as React from 'react';
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import { notAuthorizedResponse } from './APIBase';
 
 interface Auth {
   authenticated: boolean;
   lastPingResult: any | null;
   setAuthenticated(tf: boolean): void;
+  forcePing(): void;
 }
 
 const AuthContext = createContext<Auth>({
   authenticated: false,
   lastPingResult: null,
+  forcePing() {
+    console.error('auth context not configured');
+  },
   setAuthenticated(tf: boolean) {
     console.error('auth context not configured');
   },
@@ -27,16 +31,19 @@ export function AuthProvider(
 
   let { onPing, pingInterval } = props;
 
+  const check = useCallback(async () => {
+    if(!onPing) return;
+    setLastPingResult(await onPing())
+  }, [onPing]);
+
   useEffect(() => {
     if (!onPing) return;
-    const ping = onPing;
 
-    const check = async () => setLastPingResult(await ping());
     check(); // trigger check now b/c setInterval will wait for the first interval to elapse
 
     const checker = setInterval(check, pingInterval || 30 * 1000);
     return () => clearInterval(checker);
-  }, [onPing, pingInterval]);
+  }, [onPing, pingInterval, check]);
 
   useEffect(() => {
     const sub = notAuthorizedResponse.subscribe(() => {
@@ -46,10 +53,11 @@ export function AuthProvider(
     return () => sub.cancel();
   }, []);
 
-  const ctx = useMemo(() => ({ authenticated, setAuthenticated, lastPingResult }), [
+  const ctx = useMemo(() => ({ authenticated, setAuthenticated, lastPingResult, forcePing: check }), [
     authenticated,
     setAuthenticated,
     lastPingResult,
+    check,
   ]);
 
   return <AuthContext.Provider value={ctx}>{props.children}</AuthContext.Provider>;
