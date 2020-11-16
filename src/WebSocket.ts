@@ -41,10 +41,11 @@ export function useWebSocket(
 
   useEffect(() => {
     if (!socket) return;
-    if (!onOpen) return;
 
     const callback = (e: Event) => {
       setReady(true);
+
+      if (!onOpen) return;
       onOpen(socket, e);
     };
 
