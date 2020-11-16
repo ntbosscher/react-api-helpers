@@ -16,7 +16,7 @@ export function useWebSocket(
   const [socket, setSocket] = useState<WebSocket | undefined>();
   const [ready, setReady] = useState(false);
   const auth = useAuthenticated();
-  const isAuthenticated = auth.authenticated
+  const isAuthenticated = auth.authenticated;
 
   useEffect(() => {
     const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
@@ -66,13 +66,16 @@ export function useWebSocket(
       setReady(false);
       if (onClose) onClose(socket, e);
 
-      timeout = setTimeout(() => {
-        setRefresh((old) => !old);
-      }, e.code === 1006 ? 5 * 60 * 1000 : 1000);
+      timeout = setTimeout(
+        () => {
+          setRefresh((old) => !old);
+        },
+        e.code === 1006 ? 5 * 60 * 1000 : 1000,
+      );
     });
 
     return () => {
-      if(timeout) clearTimeout(timeout);
+      if (timeout) clearTimeout(timeout);
     };
   }, [socket, onClose]);
 
