@@ -13,6 +13,7 @@ export function useWebSocket(
   const { onOpen, onClose } = props || {};
   const [refresh, setRefresh] = useState(false);
   const [socket, setSocket] = useState<WebSocket | undefined>();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
@@ -43,6 +44,7 @@ export function useWebSocket(
     if (!onOpen) return;
 
     const callback = (e: Event) => {
+      setReady(true);
       onOpen(socket, e);
     };
 
@@ -56,7 +58,9 @@ export function useWebSocket(
     if (!socket) return;
 
     socket.addEventListener('close', (e) => {
+      setReady(false);
       if (onClose) onClose(socket, e);
+
       setTimeout(() => {
         setRefresh((old) => !old);
       }, 1000);
@@ -74,5 +78,7 @@ export function useWebSocket(
     };
   }, [socket, onMessage]);
 
-  return socket;
+  // only return socket once it's ready to make things more straightforward for people
+  // doing stuff like `useEffect(() => {}, [socket, projectId]);`
+  return ready ? socket : undefined;
 }
