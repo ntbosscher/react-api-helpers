@@ -1,6 +1,7 @@
 import { ParsedUrlQueryInput } from 'querystring';
 import querystring from 'querystring';
 import moment from 'moment';
+import { browserWindowId } from './BrowserWindowId';
 
 export class Fetcher {
   defaultHeaders: Headers;
@@ -10,6 +11,7 @@ export class Fetcher {
     this.on401 = options.on401;
     this.defaultHeaders = new Headers({
       accept: 'application/json',
+      'X-BrowserWindowId': browserWindowId,
     });
 
     if (options.apiVersion) {
