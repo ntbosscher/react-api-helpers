@@ -5,8 +5,8 @@ export function useWebSocket(
   onMessage: (data: string) => void,
   onMessageDeps: any[],
   props?: {
-    onOpen?(): void;
-    onClose?(): void;
+    onOpen?(socket: WebSocket, e: Event): void;
+    onClose?(socket: WebSocket, e: Event): void;
   },
 ) {
   const { onOpen, onClose } = props || {};
@@ -29,17 +29,21 @@ export function useWebSocket(
     if (!socket) return;
     if (!onOpen) return;
 
-    socket.addEventListener('open', onOpen);
+    const callback = (e: Event) => {
+      onOpen(socket, e);
+    };
+
+    socket.addEventListener('open', callback);
     return () => {
-      socket.removeEventListener('open', onOpen);
+      socket.removeEventListener('open', callback);
     };
   }, [socket, onOpen]);
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.addEventListener('close', () => {
-      if (onClose) onClose();
+    socket.addEventListener('close', (e) => {
+      if (onClose) onClose(socket, e);
       setTimeout(() => {
         setRefresh((old) => !old);
       }, 1000);
