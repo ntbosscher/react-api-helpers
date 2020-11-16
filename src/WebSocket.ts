@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { browserWindowId } from './BrowserWindowId';
 
 export function useWebSocket(
   path: string,
@@ -15,6 +16,18 @@ export function useWebSocket(
 
   useEffect(() => {
     const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
+
+    const pathParts = path.split('?');
+    if (pathParts.length === 1) {
+      pathParts.push('');
+    }
+
+    const query = new URLSearchParams(pathParts[1]);
+    query.set('browser-window-id', browserWindowId);
+    pathParts[1] = query.toString();
+
+    path = pathParts.join('?');
+
     const s = new WebSocket(protocol + '//' + window.location.host + path);
     setSocket(s);
 
