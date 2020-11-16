@@ -61,5 +61,5 @@ export function useWebSocket(
     };
   }, [socket, onMessage]);
 
-  return null;
+  return socket;
 }
