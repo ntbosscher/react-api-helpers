@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { browserWindowId } from './BrowserWindowId';
+import { useAuthenticated } from './Auth';
 
 export function useWebSocket(
   path: string,
@@ -14,6 +15,8 @@ export function useWebSocket(
   const [refresh, setRefresh] = useState(false);
   const [socket, setSocket] = useState<WebSocket | undefined>();
   const [ready, setReady] = useState(false);
+  const auth = useAuthenticated();
+  const isAuthenticated = auth.authenticated
 
   useEffect(() => {
     const protocol = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
@@ -37,7 +40,7 @@ export function useWebSocket(
         s.close();
       } catch (e) {}
     };
-  }, [refresh, path]);
+  }, [refresh, path, isAuthenticated]);
 
   useEffect(() => {
     if (!socket) return;
@@ -57,15 +60,20 @@ export function useWebSocket(
 
   useEffect(() => {
     if (!socket) return;
+    let timeout: any = 0;
 
     socket.addEventListener('close', (e) => {
       setReady(false);
       if (onClose) onClose(socket, e);
 
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         setRefresh((old) => !old);
-      }, 1000);
+      }, e.code === 1006 ? 5 * 60 * 1000 : 1000);
     });
+
+    return () => {
+      if(timeout) clearTimeout(timeout);
+    };
   }, [socket, onClose]);
 
   useEffect(() => {
