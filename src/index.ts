@@ -12,3 +12,4 @@ export * from './ArrayUtils';
 export * from './SelectWithLabel';
 export * from './WebSocket';
 export * from './BrowserWindowId';
+export * from './Debug';
