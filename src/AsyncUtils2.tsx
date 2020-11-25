@@ -83,20 +83,20 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
       setLoading(true);
 
       let thisLoadId = 0;
-      setLoadId(old => {
+      setLoadId((old) => {
         thisLoadId = (old + 1) % 1000;
         return thisLoadId;
-      })
+      });
 
       const result = await addDevelopmentDelay(cb(memoizedSearch));
 
       let isActiveRequest = true;
-      setLoadId(old => {
+      setLoadId((old) => {
         isActiveRequest = old === thisLoadId;
         return old;
-      })
+      });
 
-      if(!isActiveRequest) return;
+      if (!isActiveRequest) return;
 
       if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
       setValue(result);

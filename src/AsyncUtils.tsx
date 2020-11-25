@@ -54,21 +54,21 @@ export function useAsync<T, I>(
         setIsInit(true);
 
         let thisLoadId = 0;
-        setLoadId(old => {
+        setLoadId((old) => {
           thisLoadId = (old + 1) % 1000;
           return thisLoadId;
-        })
+        });
 
         // @ts-ignore
         const result = await addDevelopmentDelay(cb(input));
 
         let isActiveRequest = true;
-        setLoadId(old => {
+        setLoadId((old) => {
           isActiveRequest = old === thisLoadId;
           return old;
-        })
+        });
 
-        if(!isActiveRequest) return;
+        if (!isActiveRequest) return;
 
         if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
         setValue(result);
@@ -160,10 +160,10 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       setLoading(true);
 
       let thisLoadId = 0;
-      setLoadId(old => {
+      setLoadId((old) => {
         thisLoadId = (old + 1) % 1000;
         return thisLoadId;
-      })
+      });
 
       const actionResult = await addDevelopmentDelay(callback(arg));
       if (actionResult && typeof actionResult === 'object' && 'error' in actionResult) {
@@ -171,12 +171,12 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       }
 
       let isActiveRequest = true;
-      setLoadId(old => {
+      setLoadId((old) => {
         isActiveRequest = old === thisLoadId;
         return old;
-      })
+      });
 
-      if(!isActiveRequest) return;
+      if (!isActiveRequest) return;
 
       setLoading(false);
       setResult(actionResult);
