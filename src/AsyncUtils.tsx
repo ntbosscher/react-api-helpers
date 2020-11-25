@@ -42,6 +42,7 @@ export function useAsync<T, I>(
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isInit, setIsInit] = useState(false);
+  const [_, setLoadId] = useState(0);
 
   const cb = options?.dependsOn ? useCallback(fx, options?.dependsOn) : fx;
 
@@ -51,8 +52,24 @@ export function useAsync<T, I>(
         setError(null);
         setLoading(true);
         setIsInit(true);
+
+        let thisLoadId = 0;
+        setLoadId(old => {
+          thisLoadId = (old + 1) % 1000;
+          return thisLoadId;
+        })
+
         // @ts-ignore
         const result = await addDevelopmentDelay(cb(input));
+
+        let isActiveRequest = true;
+        setLoadId(old => {
+          isActiveRequest = old === thisLoadId;
+          return old;
+        })
+
+        if(!isActiveRequest) return;
+
         if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
         setValue(result);
       } catch (e) {
@@ -134,6 +151,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<T | null>(null);
+  const [_, setLoadId] = useState(0);
   const depends = [...dependsOn, callback];
 
   const theCallback = useCallback(async (arg) => {
@@ -141,10 +159,24 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       setError(null);
       setLoading(true);
 
+      let thisLoadId = 0;
+      setLoadId(old => {
+        thisLoadId = (old + 1) % 1000;
+        return thisLoadId;
+      })
+
       const actionResult = await addDevelopmentDelay(callback(arg));
       if (actionResult && typeof actionResult === 'object' && 'error' in actionResult) {
         throw new Error((actionResult as any).error);
       }
+
+      let isActiveRequest = true;
+      setLoadId(old => {
+        isActiveRequest = old === thisLoadId;
+        return old;
+      })
+
+      if(!isActiveRequest) return;
 
       setLoading(false);
       setResult(actionResult);

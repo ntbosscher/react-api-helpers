@@ -70,6 +70,7 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [_, setLoadId] = useState(0);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cb = useMemo(() => fx, []);
@@ -80,7 +81,23 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
     try {
       setError(null);
       setLoading(true);
+
+      let thisLoadId = 0;
+      setLoadId(old => {
+        thisLoadId = (old + 1) % 1000;
+        return thisLoadId;
+      })
+
       const result = await addDevelopmentDelay(cb(memoizedSearch));
+
+      let isActiveRequest = true;
+      setLoadId(old => {
+        isActiveRequest = old === thisLoadId;
+        return old;
+      })
+
+      if(!isActiveRequest) return;
+
       if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
       setValue(result);
     } catch (e) {
