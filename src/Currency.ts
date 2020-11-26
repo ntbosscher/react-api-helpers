@@ -11,7 +11,7 @@ export function formatCents(n: Cents | undefined) {
 }
 
 export function parseCents(str: string): number {
-  const parts = str.replace(/,/g, "").split('.');
+  const parts = str.replace(/,/g, '').split('.');
   let dollars = parseInt(parts[0], 10);
   let cents = 0;
   if (parts.length >= 2) {
