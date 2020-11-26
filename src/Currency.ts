@@ -7,11 +7,11 @@ export function formatCents(n: Cents | undefined) {
   const dollars = Math.floor(n / 100);
   const cents = (n % 100).toString().padStart(2, '0');
 
-  return `${dollars}.${cents}`;
+  return `${dollars.toLocaleString()}.${cents}`;
 }
 
 export function parseCents(str: string): number {
-  const parts = str.split('.');
+  const parts = str.replace(/,/g, "").split('.');
   let dollars = parseInt(parts[0], 10);
   let cents = 0;
   if (parts.length >= 2) {
