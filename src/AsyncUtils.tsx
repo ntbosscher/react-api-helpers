@@ -217,7 +217,7 @@ export function NoResultEl(LoadingElement: JSX.Element | null, result: any) {
 }
 
 export async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
-  const isLocalHost = window.location.hostname === 'localhost';
+  const isLocalHost = window.location && window.location.hostname === 'localhost';
   if (!isLocalHost) {
     return p;
   }
