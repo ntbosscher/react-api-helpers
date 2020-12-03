@@ -6,7 +6,7 @@ import { browserWindowId } from './BrowserWindowId';
 type PreflightInput = {
   path: string;
   params: RequestInit;
-}
+};
 
 type PreflightMiddleware = (input: PreflightInput) => PreflightInput;
 
@@ -50,7 +50,7 @@ export class Fetcher {
     for (var i in body) {
       fd.append(i, body[i]);
     }
-    
+
     const result = await this.fetch(path, {
       method: 'POST',
       headers: this.defaultHeaders,
@@ -61,12 +61,12 @@ export class Fetcher {
 
     return this.handleResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
-  
+
   fetch(path: string, params: RequestInit) {
     let input: PreflightInput = {
       path: path,
       params: params,
-    }
+    };
 
     input = this.preflight.reduce((acc, item) => item(acc), input);
     return fetch(input.path, input.params);
