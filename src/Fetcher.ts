@@ -3,9 +3,17 @@ import querystring from 'querystring';
 import moment from 'moment';
 import { browserWindowId } from './BrowserWindowId';
 
+type PreflightInput = {
+  path: string;
+  params: RequestInit;
+}
+
+type PreflightMiddleware = (input: PreflightInput) => PreflightInput;
+
 export class Fetcher {
   defaultHeaders: Headers;
   on401: (retry: () => Promise<any>) => Promise<any>;
+  preflight: PreflightMiddleware[] = [];
 
   constructor(options: { on401: (retry: () => Promise<any>) => Promise<any>; apiVersion?: string }) {
     this.on401 = options.on401;
@@ -42,8 +50,8 @@ export class Fetcher {
     for (var i in body) {
       fd.append(i, body[i]);
     }
-
-    const result = await fetch(path, {
+    
+    const result = await this.fetch(path, {
       method: 'POST',
       headers: this.defaultHeaders,
       credentials: 'include',
@@ -53,11 +61,21 @@ export class Fetcher {
 
     return this.handleResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
+  
+  fetch(path: string, params: RequestInit) {
+    let input: PreflightInput = {
+      path: path,
+      params: params,
+    }
+
+    input = this.preflight.reduce((acc, item) => item(acc), input);
+    return fetch(input.path, input.params);
+  }
 
   async postForAuth<T>(path: string, body: any): Promise<T> {
     path = this.updatePath(path);
 
-    const result = await fetch(path, {
+    const result = await this.fetch(path, {
       method: 'POST',
       headers: this.defaultHeaders,
       credentials: 'include',
@@ -71,7 +89,7 @@ export class Fetcher {
   async post<T>(path: string, body: any, isRetry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
-    const result = await fetch(path, {
+    const result = await this.fetch(path, {
       method: 'POST',
       headers: this.defaultHeaders,
       credentials: 'include',
@@ -85,7 +103,7 @@ export class Fetcher {
   async put<T>(path: string, body: any, retry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
-    const result = await fetch(path, {
+    const result = await this.fetch(path, {
       method: 'PUT',
       headers: this.defaultHeaders,
       credentials: 'include',
@@ -104,7 +122,7 @@ export class Fetcher {
       fullPath = path + '?' + querystring.stringify(urlParameters);
     }
 
-    const result = await fetch(fullPath, {
+    const result = await this.fetch(fullPath, {
       method: 'GET',
       headers: this.defaultHeaders,
       credentials: 'include',

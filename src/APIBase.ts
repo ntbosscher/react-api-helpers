@@ -3,13 +3,16 @@ import { EventEmitter } from './EventEmitter';
 
 export class APIBase {
   fetcher: Fetcher;
+  onRefresh = new EventEmitter<any>();
 
   constructor(options?: APIBaseOptions) {
     this.fetcher = new Fetcher({
       on401: async (retry: () => Promise<any>) => {
         if (options?.jwtRefreshEndpoint) {
           try {
-            await this.fetcher.postForAuth(options.jwtRefreshEndpoint, {});
+            const result = await this.fetcher.postForAuth(options.jwtRefreshEndpoint, {});
+            this.onRefresh.emit(result);
+
             return retry();
           } catch (e) {
             // continue to access-denied
