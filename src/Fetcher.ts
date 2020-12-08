@@ -133,18 +133,21 @@ export class Fetcher {
   }
 
   async handleResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
+
+    if (!isRetry && result.status === 401 && retry) {
+      return this.on401(retry);
+    }
+
     const contentType = result.headers.get('Content-Type');
     if (contentType && contentType.indexOf('json') === -1) {
       if (result.status === 404) {
         throw new Error('Not found');
       }
+
+      return result as any as T;
     }
 
     const jsonData = await result.json();
-
-    if (!isRetry && result.status === 401 && retry) {
-      return this.on401(retry);
-    }
 
     if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
       throw new Error(jsonData.error);
