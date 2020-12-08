@@ -133,7 +133,6 @@ export class Fetcher {
   }
 
   async handleResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
-
     if (!isRetry && result.status === 401 && retry) {
       return this.on401(retry);
     }
@@ -144,7 +143,7 @@ export class Fetcher {
         throw new Error('Not found');
       }
 
-      return result as any as T;
+      return (result as any) as T;
     }
 
     const jsonData = await result.json();
