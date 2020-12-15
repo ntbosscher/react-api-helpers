@@ -70,7 +70,10 @@ export function useAsync<T, I>(
 
         if (!isActiveRequest) return;
 
-        if (result && typeof result === 'object' && 'error' in result) throw new Error(result.error);
+        if (result && typeof result === 'object') {
+          if ('error' in result) throw new Error(result.error);
+        }
+
         setValue(result);
       } catch (e) {
         setError(e.toString());
