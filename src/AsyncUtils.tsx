@@ -5,6 +5,7 @@ import { Grid } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useAuthenticated } from './Auth';
+import green from '@material-ui/core/colors/green';
 
 type DefaultLister<T> = T extends Array<any> ? { asList: T extends (infer U)[] ? U[] : never } : { asList: never };
 
@@ -156,6 +157,18 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const [result, setResult] = useState<T | null>(null);
   const [_, setLoadId] = useState(0);
   const depends = [...dependsOn, callback];
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // automatically return showSuccess to false after timeout
+  useEffect(() => {
+    if (!showSuccess) return;
+
+    const id = setTimeout(() => {
+      setShowSuccess(false);
+    }, 5000);
+
+    return () => clearTimeout(id);
+  }, [showSuccess]);
 
   const theCallback = useCallback(async (arg) => {
     try {
@@ -183,6 +196,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
 
       setLoading(false);
       setResult(actionResult);
+      setShowSuccess(true);
     } catch (e) {
       setError(e.toString());
       setLoading(false);
@@ -193,9 +207,16 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
 
   const LoadingElement = LoadingEl(loading, error);
   const NoResultElement = NoResultEl(LoadingElement, result);
+  const SuccessElement = showSuccess ? (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Typography style={{ color: green['800'] }} variant="body1">
+        Success
+      </Typography>
+    </div>
+  ) : null;
 
   return {
-    LoadingElement,
+    LoadingElement: LoadingElement || SuccessElement,
     loading,
     error,
     callback: theCallback as (arg: U) => Promise<void>,
