@@ -56,7 +56,7 @@ export class Fetcher {
       headers: this.defaultHeaders,
       credentials: 'include',
       cache: 'no-cache',
-      redirect: "follow",
+      redirect: 'follow',
       body: fd,
     });
 
@@ -81,7 +81,7 @@ export class Fetcher {
       headers: this.defaultHeaders,
       credentials: 'include',
       cache: 'no-cache',
-      redirect: "follow",
+      redirect: 'follow',
       body: JSON.stringify(body),
     });
 
@@ -110,7 +110,7 @@ export class Fetcher {
       headers: this.defaultHeaders,
       credentials: 'include',
       cache: 'no-cache',
-      redirect: "follow",
+      redirect: 'follow',
       body: JSON.stringify(body),
     });
 
@@ -130,7 +130,7 @@ export class Fetcher {
       headers: this.defaultHeaders,
       credentials: 'include',
       cache: 'no-cache',
-      redirect: "follow",
+      redirect: 'follow',
     });
 
     return this.handleResponse<T>(result, () => this.get(path, urlParameters, true), isRetry);
