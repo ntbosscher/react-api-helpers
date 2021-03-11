@@ -3,11 +3,17 @@ export type Cents = number;
 export function formatCents(n: Cents | undefined) {
   if (n === undefined) return '0.00';
 
+  let isNeg = n < 0;
+  if(isNeg) n = n * -1;
+
   n = Math.round(n);
+
+  const neg = isNeg ? "-" : "";
   const dollars = Math.floor(n / 100);
   const cents = (n % 100).toString().padStart(2, '0');
 
-  return `${dollars.toLocaleString()}.${cents}`;
+
+  return `${neg}${dollars.toLocaleString()}.${cents}`;
 }
 
 export function parseCents(str: string): number {
