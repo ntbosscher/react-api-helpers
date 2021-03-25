@@ -30,7 +30,6 @@ export class Fetcher {
     this.defaultHeaders.append('X-TimezoneOffsetMins', moment().utcOffset().toString());
   }
 
-
   updatePath(path: string): string {
     return path;
   }
@@ -65,7 +64,12 @@ export class Fetcher {
     return this.handleFetchResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
 
-  async postFormDataWithProgress<T>(path: string, body: { [k: string]: string | Blob }, onProgress: ProgressCallback, isRetry: boolean = false): Promise<T> {
+  async postFormDataWithProgress<T>(
+    path: string,
+    body: { [k: string]: string | Blob },
+    onProgress: ProgressCallback,
+    isRetry: boolean = false,
+  ): Promise<T> {
     path = this.updatePath(path);
 
     const fd = new FormData();
@@ -73,16 +77,24 @@ export class Fetcher {
       fd.append(i, body[i]);
     }
 
-    const result = await this.xhr(path, {
-      method: 'POST',
-      headers: this.defaultHeaders,
-      credentials: 'include',
-      cache: 'no-cache',
-      redirect: 'follow',
-      body: fd,
-    }, onProgress);
+    const result = await this.xhr(
+      path,
+      {
+        method: 'POST',
+        headers: this.defaultHeaders,
+        credentials: 'include',
+        cache: 'no-cache',
+        redirect: 'follow',
+        body: fd,
+      },
+      onProgress,
+    );
 
-    return this.handleXhrResponse<T>(result, () => this.postFormDataWithProgress(path, body, onProgress, true), isRetry);
+    return this.handleXhrResponse<T>(
+      result,
+      () => this.postFormDataWithProgress(path, body, onProgress, true),
+      isRetry,
+    );
   }
 
   xhr(path: string, params: RequestInit, onProgress: (e: ProgressEvent<XMLHttpRequestEventTarget>) => any) {
@@ -96,56 +108,55 @@ export class Fetcher {
         input = this.preflight.reduce((acc, item) => item(acc), input);
 
         let xhr = new XMLHttpRequest();
-        xhr.open(input.params.method || "GET", input.path, true);
-        if(input.params.cache === "no-cache") {
+        xhr.open(input.params.method || 'GET', input.path, true);
+        if (input.params.cache === 'no-cache') {
           xhr.setRequestHeader('Cache-Control', 'no-cache');
         }
 
-        if(input.params.headers) {
-          if(input.params.headers instanceof Array) {
-            input.params.headers.map(pair => xhr.setRequestHeader(pair[0], pair[1]));
-          } else if("forEach" in input.params.headers) {
+        if (input.params.headers) {
+          if (input.params.headers instanceof Array) {
+            input.params.headers.map((pair) => xhr.setRequestHeader(pair[0], pair[1]));
+          } else if ('forEach' in input.params.headers) {
             // @ts-ignore
             input.params.headers.forEach((value, key, parent) => {
               xhr.setRequestHeader(key, value);
-            })
+            });
           } else {
-            for(let key in input.params.headers) {
-              if(input.params.headers.hasOwnProperty(key)) {
+            for (let key in input.params.headers) {
+              if (input.params.headers.hasOwnProperty(key)) {
                 xhr.setRequestHeader(key, input.params.headers[key]);
               }
             }
           }
         }
 
-        xhr.withCredentials = input.params.credentials !== "omit";
+        xhr.withCredentials = input.params.credentials !== 'omit';
 
-        xhr.upload.addEventListener("progress", onProgress, false);
-        xhr.addEventListener("load", e => {
+        xhr.upload.addEventListener('progress', onProgress, false);
+        xhr.addEventListener('load', (e) => {
           if (xhr.readyState !== 4) return;
 
-          const location = xhr.getResponseHeader("Location");
-          if(location) {
-            if(input.params.redirect === "follow") {
+          const location = xhr.getResponseHeader('Location');
+          if (location) {
+            if (input.params.redirect === 'follow') {
               this.xhr(location, params, onProgress).then(resolve, reject);
               return;
             }
 
-            if(input.params.redirect === "error") {
-              reject("Received redirect");
+            if (input.params.redirect === 'error') {
+              reject('Received redirect');
               return;
             }
           }
 
           resolve(xhr);
-        })
+        });
 
-        if(input.params.method === "POST") {
+        if (input.params.method === 'POST') {
           xhr.send(input.params.body);
         } else {
-          xhr.send()
+          xhr.send();
         }
-
       } catch (e) {
         reject(e);
       }
@@ -253,7 +264,7 @@ export class Fetcher {
   }
 
   isOkStatus(value: number) {
-    return (value < 400);
+    return value < 400;
   }
 
   async handleFetchResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
