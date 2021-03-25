@@ -9,6 +9,7 @@ type PreflightInput = {
 };
 
 type PreflightMiddleware = (input: PreflightInput) => PreflightInput;
+export type ProgressCallback = (e: ProgressEvent<XMLHttpRequestEventTarget>) => any;
 
 export class Fetcher {
   defaultHeaders: Headers;
@@ -28,6 +29,7 @@ export class Fetcher {
 
     this.defaultHeaders.append('X-TimezoneOffsetMins', moment().utcOffset().toString());
   }
+
 
   updatePath(path: string): string {
     return path;
@@ -60,7 +62,94 @@ export class Fetcher {
       body: fd,
     });
 
-    return this.handleResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
+    return this.handleFetchResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
+  }
+
+  async postFormDataWithProgress<T>(path: string, body: { [k: string]: string | Blob }, onProgress: ProgressCallback, isRetry: boolean = false): Promise<T> {
+    path = this.updatePath(path);
+
+    const fd = new FormData();
+    for (var i in body) {
+      fd.append(i, body[i]);
+    }
+
+    const result = await this.xhr(path, {
+      method: 'POST',
+      headers: this.defaultHeaders,
+      credentials: 'include',
+      cache: 'no-cache',
+      redirect: 'follow',
+      body: fd,
+    }, onProgress);
+
+    return this.handleXhrResponse<T>(result, () => this.postFormDataWithProgress(path, body, onProgress, true), isRetry);
+  }
+
+  xhr(path: string, params: RequestInit, onProgress: (e: ProgressEvent<XMLHttpRequestEventTarget>) => any) {
+    return new Promise<XMLHttpRequest>((resolve, reject) => {
+      try {
+        let input: PreflightInput = {
+          path: path,
+          params: params,
+        };
+
+        input = this.preflight.reduce((acc, item) => item(acc), input);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(input.params.method || "GET", input.path, true);
+        if(input.params.cache === "no-cache") {
+          xhr.setRequestHeader('Cache-Control', 'no-cache');
+        }
+
+        if(input.params.headers) {
+          if(input.params.headers instanceof Array) {
+            input.params.headers.map(pair => xhr.setRequestHeader(pair[0], pair[1]));
+          } else if("forEach" in input.params.headers) {
+            // @ts-ignore
+            input.params.headers.forEach((value, key, parent) => {
+              xhr.setRequestHeader(key, value);
+            })
+          } else {
+            for(let key in input.params.headers) {
+              if(input.params.headers.hasOwnProperty(key)) {
+                xhr.setRequestHeader(key, input.params.headers[key]);
+              }
+            }
+          }
+        }
+
+        xhr.withCredentials = input.params.credentials !== "omit";
+
+        xhr.upload.addEventListener("progress", onProgress, false);
+        xhr.addEventListener("load", e => {
+          if (xhr.readyState !== 4) return;
+
+          const location = xhr.getResponseHeader("Location");
+          if(location) {
+            if(input.params.redirect === "follow") {
+              this.xhr(location, params, onProgress).then(resolve, reject);
+              return;
+            }
+
+            if(input.params.redirect === "error") {
+              reject("Received redirect");
+              return;
+            }
+          }
+
+          resolve(xhr);
+        })
+
+        if(input.params.method === "POST") {
+          xhr.send(input.params.body);
+        } else {
+          xhr.send()
+        }
+
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
   fetch(path: string, params: RequestInit) {
@@ -85,7 +174,7 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result);
+    return this.handleFetchResponse<T>(result);
   }
 
   async post<T>(path: string, body: any, isRetry: boolean = false): Promise<T> {
@@ -99,7 +188,7 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result, () => this.post(path, body, true), isRetry);
+    return this.handleFetchResponse<T>(result, () => this.post(path, body, true), isRetry);
   }
 
   async put<T>(path: string, body: any, retry: boolean = false): Promise<T> {
@@ -114,7 +203,7 @@ export class Fetcher {
       body: JSON.stringify(body),
     });
 
-    return this.handleResponse<T>(result, () => this.put(path, body, true), retry);
+    return this.handleFetchResponse<T>(result, () => this.put(path, body, true), retry);
   }
 
   async get<T>(path: string, urlParameters?: ParsedUrlQueryInput, isRetry = false): Promise<T> {
@@ -133,10 +222,41 @@ export class Fetcher {
       redirect: 'follow',
     });
 
-    return this.handleResponse<T>(result, () => this.get(path, urlParameters, true), isRetry);
+    return this.handleFetchResponse<T>(result, () => this.get(path, urlParameters, true), isRetry);
   }
 
-  async handleResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
+  async handleXhrResponse<T>(xhr: XMLHttpRequest, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
+    if (!isRetry && xhr.status === 401 && retry) {
+      return this.on401(retry);
+    }
+
+    const contentType = xhr.getResponseHeader('Content-Type');
+    if (contentType && contentType.indexOf('json') === -1) {
+      if (xhr.status === 404) {
+        throw new Error('Not found');
+      }
+
+      return (xhr as any) as T;
+    }
+
+    const jsonData = JSON.parse(xhr.responseText);
+
+    if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
+      throw new Error(jsonData.error);
+    }
+
+    if (!this.isOkStatus(xhr.status)) {
+      throw new Error(jsonData);
+    }
+
+    return jsonData as T;
+  }
+
+  isOkStatus(value: number) {
+    return (value < 400);
+  }
+
+  async handleFetchResponse<T>(result: Response, retry?: () => Promise<T>, isRetry: boolean = false): Promise<T> {
     if (!isRetry && result.status === 401 && retry) {
       return this.on401(retry);
     }
