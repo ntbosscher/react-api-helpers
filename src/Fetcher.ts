@@ -64,6 +64,30 @@ export class Fetcher {
     return this.handleFetchResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
 
+  async fetchWithProgress<T>(
+    method: "POST" | "PUT",
+    path: string,
+    body: BodyInit,
+    onProgress: ProgressCallback
+  ) {
+    path = this.updatePath(path);
+
+    const result = await this.xhr(
+      path,
+      {
+        method: method,
+        headers: this.defaultHeaders,
+        credentials: 'include',
+        cache: 'no-cache',
+        redirect: 'follow',
+        body: body,
+      },
+      onProgress,
+    );
+
+    return this.handleXhrResponse<T>(result);
+  }
+
   async postFormDataWithProgress<T>(
     path: string,
     body: { [k: string]: string | Blob },
@@ -152,7 +176,7 @@ export class Fetcher {
           resolve(xhr);
         });
 
-        if (input.params.method === 'POST') {
+        if (input.params.body) {
           xhr.send(input.params.body);
         } else {
           xhr.send();
