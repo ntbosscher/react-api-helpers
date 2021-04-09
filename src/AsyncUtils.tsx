@@ -156,7 +156,6 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<T | null>(null);
   const [_, setLoadId] = useState(0);
-  const depends = [...dependsOn, callback];
   const [showSuccess, setShowSuccess] = useState(false);
 
   // automatically return showSuccess to false after timeout
@@ -203,7 +202,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, depends);
+  }, dependsOn);
 
   const LoadingElement = LoadingEl(loading, error);
   const NoResultElement = NoResultEl(LoadingElement, result);
