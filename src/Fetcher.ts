@@ -289,7 +289,11 @@ export class Fetcher {
     }
 
     const contentType = xhr.getResponseHeader('Content-Type');
-    if (contentType && contentType.indexOf('json') === -1) {
+
+    const isNotJsonContentType = contentType && contentType.indexOf('json') === -1;
+    const noContent = !contentType && !xhr.responseText;
+
+    if (isNotJsonContentType || noContent) {
       if (xhr.status === 404) {
         throw new Error('Not found');
       }
