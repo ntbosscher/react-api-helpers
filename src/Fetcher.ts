@@ -8,6 +8,11 @@ type PreflightInput = {
   params: RequestInit;
 };
 
+export type XhrHooks = {
+  input?: (input: PreflightInput) => PreflightInput;
+  preSend?: (xhr: XMLHttpRequest) => void;
+}
+
 type PreflightMiddleware = (input: PreflightInput) => PreflightInput;
 export type ProgressCallback = (e: ProgressEvent<XMLHttpRequestEventTarget>) => any;
 
@@ -64,7 +69,8 @@ export class Fetcher {
     return this.handleFetchResponse<T>(result, () => this.postFormData(path, body, true), isRetry);
   }
 
-  async fetchWithProgress<T>(method: 'POST' | 'PUT', path: string, body: BodyInit, onProgress: ProgressCallback) {
+  async fetchWithProgress<T>(method: 'POST' | 'PUT', path: string, body: BodyInit,
+                             onProgress: ProgressCallback, hooks?: XhrHooks) {
     path = this.updatePath(path);
 
     const result = await this.xhr(
@@ -78,6 +84,7 @@ export class Fetcher {
         body: body,
       },
       onProgress,
+      hooks
     );
 
     return this.handleXhrResponse<T>(result);
@@ -87,6 +94,7 @@ export class Fetcher {
     path: string,
     body: { [k: string]: string | Blob },
     onProgress: ProgressCallback,
+    hooks: XhrHooks | null = null,
     isRetry: boolean = false,
   ): Promise<T> {
     path = this.updatePath(path);
@@ -107,16 +115,21 @@ export class Fetcher {
         body: fd,
       },
       onProgress,
+      hooks
     );
 
     return this.handleXhrResponse<T>(
       result,
-      () => this.postFormDataWithProgress(path, body, onProgress, true),
+      () => this.postFormDataWithProgress(path, body, onProgress, hooks, true),
       isRetry,
     );
   }
 
-  xhr(path: string, params: RequestInit, onProgress: (e: ProgressEvent<XMLHttpRequestEventTarget>) => any) {
+  xhr(path: string,
+      params: RequestInit,
+      onProgress: (e: ProgressEvent<XMLHttpRequestEventTarget>) => any,
+      hooks?: XhrHooks | null,
+  ) {
     return new Promise<XMLHttpRequest>((resolve, reject) => {
       try {
         let input: PreflightInput = {
@@ -125,6 +138,9 @@ export class Fetcher {
         };
 
         input = this.preflight.reduce((acc, item) => item(acc), input);
+        if(hooks && hooks.input) {
+          input = hooks.input(input);
+        }
 
         let xhr = new XMLHttpRequest();
         xhr.open(input.params.method || 'GET', input.path, true);
@@ -170,6 +186,10 @@ export class Fetcher {
 
           resolve(xhr);
         });
+
+        if(hooks && hooks.preSend) {
+          hooks.preSend(xhr);
+        }
 
         if (input.params.body) {
           xhr.send(input.params.body);
