@@ -1,24 +1,19 @@
-import {
-  OptionsObject,
-  SnackbarKey,
-  SnackbarProvider,
-  useSnackbar,
-} from "notistack";
-import React, { PropsWithChildren } from "react";
+import { OptionsObject, SnackbarKey, SnackbarProvider, useSnackbar } from 'notistack';
+import React, { PropsWithChildren } from 'react';
 
 export function showSuccessSnack(msg: string): SnackbarKey {
   return showSnack(msg, {
-    variant: "success",
+    variant: 'success',
   });
 }
 
 export function showSnack(msg: string, options?: OptionsObject): SnackbarKey {
-  if (!show) throw new Error("missing TSnackbarProvider");
+  if (!show) throw new Error('missing TSnackbarProvider');
   return show(msg, options);
 }
 
 export function hideSnack(key: SnackbarKey) {
-  if (!hide) throw new Error("missing TSnackbarProvider");
+  if (!hide) throw new Error('missing TSnackbarProvider');
   return hide(key);
 }
 
