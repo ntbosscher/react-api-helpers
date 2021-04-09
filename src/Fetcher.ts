@@ -174,8 +174,8 @@ export class Fetcher {
         xhr.withCredentials = input.params.credentials !== 'omit';
 
         xhr.upload.addEventListener('progress', onProgress, false);
-        xhr.addEventListener("abort", e => reject(e))
-        xhr.addEventListener("error", e => reject(e))
+        xhr.addEventListener('abort', (e) => reject(e));
+        xhr.addEventListener('error', (e) => reject(e));
         xhr.addEventListener('load', (e) => {
           if (xhr.readyState !== 4) return;
 
