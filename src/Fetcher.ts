@@ -179,7 +179,14 @@ export class Fetcher {
         xhr.addEventListener('load', (e) => {
           if (xhr.readyState !== 4) return;
 
-          const location = xhr.getResponseHeader('Location');
+          let location: string|null = null;
+
+          try {
+            // ignore failures to get the Location header
+            // sometimes this happens when it's blocked by CORS
+            location = xhr.getResponseHeader('Location');
+          } catch (e) {}
+
           if (location) {
             if (input.params.redirect === 'follow') {
               this.xhr(location, params, onProgress).then(resolve, reject);
