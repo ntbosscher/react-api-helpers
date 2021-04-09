@@ -179,7 +179,7 @@ export class Fetcher {
         xhr.addEventListener('load', (e) => {
           if (xhr.readyState !== 4) return;
 
-          let location: string|null = null;
+          let location: string | null = null;
 
           try {
             // ignore failures to get the Location header
