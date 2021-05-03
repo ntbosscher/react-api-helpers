@@ -25,6 +25,7 @@ export function TFormValue(props: {
   label?: string;
   noBottomMargin?: boolean;
   debounce?: number;
+  displayValue?: (input: any) => JSX.Element;
   children: (p: Props) => JSX.Element;
 }) {
   const styles = useStyles();
