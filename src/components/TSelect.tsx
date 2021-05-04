@@ -17,7 +17,6 @@ export function TSelect<T>(props: {
   children: JSX.Element[];
   variant?: 'filled' | 'outlined';
   required?: boolean;
-  onChange(value: string): void;
 }) {
   const styles = useStyles();
 
