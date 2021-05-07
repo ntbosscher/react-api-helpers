@@ -18,6 +18,7 @@ export function UAutoComplete(props: {
   autoFocus?: boolean;
   className?: string;
   noBottomPadding?: boolean;
+  shrinkLabel?: boolean;
   freeSolo?: boolean;
   disabled?: boolean;
   onCancel?(): void;
@@ -89,7 +90,7 @@ export function UAutoComplete(props: {
         freeSolo={props.freeSolo}
         blurOnSelect
         renderInput={(params) => {
-          const { InputProps, inputProps, ...others } = params;
+          const { InputProps, inputProps, InputLabelProps, ...others } = params;
 
           return (
             <TextField
@@ -107,6 +108,9 @@ export function UAutoComplete(props: {
               })}
               InputProps={Object.assign({}, InputProps, {
                 disableUnderline: true,
+              })}
+              InputLabelProps={Object.assign({}, InputLabelProps, {
+                shrink: props.shrinkLabel,
               })}
               autoFocus={props.autoFocus}
               required={props.required}
