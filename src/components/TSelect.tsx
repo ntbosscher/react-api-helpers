@@ -18,6 +18,7 @@ export function TSelect<T>(props: {
   children: JSX.Element[];
   variant?: 'filled' | 'outlined';
   required?: boolean;
+  displayValue?: (value: any) => JSX.Element;
 }) {
   const styles = useStyles();
 
@@ -26,6 +27,10 @@ export function TSelect<T>(props: {
       objKey={props.objKey}
       label={props.label}
       displayValue={(e) => {
+        if (props.displayValue) {
+          return props.displayValue(e);
+        }
+
         const match = first(props.children, (c) => c.props.value === e);
         if (!match) return '';
         return match.props.children;
