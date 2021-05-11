@@ -52,7 +52,9 @@ export function TFormValue(props: {
         })}
       >
         {props.label && <Typography className={styles.label}>{props.label}</Typography>}
-        <Typography variant="body1">{parentValue || '-'}</Typography>
+        <Typography variant="body1">
+          {(props.displayValue ? props.displayValue(parentValue) : parentValue) || '-'}
+        </Typography>
       </div>
     );
   }
