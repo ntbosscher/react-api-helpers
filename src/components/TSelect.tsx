@@ -2,6 +2,7 @@ import * as React from 'react';
 import { FormControl, InputLabel, Select } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { TFormValue } from './TFormValue';
+import { first } from '../ArrayUtils';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -21,7 +22,15 @@ export function TSelect<T>(props: {
   const styles = useStyles();
 
   return (
-    <TFormValue objKey={props.objKey} label={props.label}>
+    <TFormValue
+      objKey={props.objKey}
+      label={props.label}
+      displayValue={(e) => {
+        const match = first(props.children, (c) => c.props.value === e);
+        if (!match) return '';
+        return match.props.children;
+      }}
+    >
       {(p) => (
         <FormControl className={styles.wrapper} style={props.style} variant={props.variant || 'filled'} fullWidth>
           <InputLabel
