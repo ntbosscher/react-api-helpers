@@ -302,7 +302,7 @@ export class Fetcher {
 
     if (isNotJsonContentType || noContent) {
       if (xhr.status >= 400) {
-        throw new FetcherError(xhr.status + " " + xhr.statusText, {xhr: xhr});
+        throw new FetcherError(xhr.status + ' ' + xhr.statusText, { xhr: xhr });
       }
 
       return (xhr as any) as T;
@@ -353,7 +353,7 @@ export class Fetcher {
   }
 }
 
-type ExtraErrorInfo = {xhr?: XMLHttpRequest}
+type ExtraErrorInfo = { xhr?: XMLHttpRequest };
 
 class FetcherError extends Error {
   info: ExtraErrorInfo;
