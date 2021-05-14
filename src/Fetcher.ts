@@ -301,8 +301,8 @@ export class Fetcher {
     const noContent = !contentType && !xhr.responseText;
 
     if (isNotJsonContentType || noContent) {
-      if (xhr.status === 404) {
-        throw new Error('Not found');
+      if (xhr.status >= 400) {
+        throw new FetcherError(xhr.status + " " + xhr.statusText, {xhr: xhr});
       }
 
       return (xhr as any) as T;
@@ -350,6 +350,17 @@ export class Fetcher {
     }
 
     return jsonData as T;
+  }
+}
+
+type ExtraErrorInfo = {xhr?: XMLHttpRequest}
+
+class FetcherError extends Error {
+  info: ExtraErrorInfo;
+
+  constructor(msg: string, info: ExtraErrorInfo) {
+    super(msg);
+    this.info = info;
   }
 }
 
