@@ -9,6 +9,13 @@ interface UElement {
   name: string;
 }
 
+function newOption(value: string): UElement {
+  return {
+    id: -1,
+    name: value,
+  }
+}
+
 export function UAutoComplete(props: {
   fetcher: (opt: { search: string }) => Promise<UElement[]>;
   fetcherDeps?: any[];
@@ -52,7 +59,15 @@ export function UAutoComplete(props: {
         disabled={props.disabled}
         options={fetcher.asList}
         className={props.className}
-        onBlur={props.onCancel}
+        onBlur={() => {
+          if(props.freeSolo && value.name !== search) {
+            const v = newOption(search);
+            setValue(v);
+            props.onChange(v);
+          }
+
+          if(props.onCancel) props.onCancel();
+        }}
         onInputChange={(event, newInputValue) => {
           setSearch(newInputValue);
         }}
@@ -78,11 +93,7 @@ export function UAutoComplete(props: {
           }
 
           if (newValue.id === -1) {
-            const v = {
-              id: -1,
-              name: (newValue as any).inputValue as string,
-            };
-
+            const v = newOption((newValue as any).inputValue as string);
             setValue(v);
             props.onChange(v);
             return;
