@@ -11,6 +11,7 @@ interface UElement {
 
 export function UAutoComplete(props: {
   fetcher: (opt: { search: string }) => Promise<UElement[]>;
+  fetcherDeps?: any[];
   initialValue?: UElement;
   label: string;
   required?: boolean;
@@ -27,7 +28,13 @@ export function UAutoComplete(props: {
 }) {
   const [search, setSearch] = useState('');
   const [debounced] = useDebounce(search, 500, { leading: true });
-  const fetcher = useAsync2((opt) => props.fetcher(opt), { search: debounced }, [debounced]);
+
+  const fetcherSearchDeps = [debounced];
+  if (props.fetcherDeps) {
+    fetcherSearchDeps.push(...props.fetcherDeps);
+  }
+  const fetcher = useAsync2((opt) => props.fetcher(opt), { search: debounced }, fetcherSearchDeps);
+
   const [value, setValue] = useState(
     props.initialValue ||
       ({
