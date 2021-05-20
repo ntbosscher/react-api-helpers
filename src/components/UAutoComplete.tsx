@@ -13,7 +13,7 @@ function newOption(value: string): UElement {
   return {
     id: -1,
     name: value,
-  }
+  };
 }
 
 export function UAutoComplete(props: {
@@ -60,13 +60,13 @@ export function UAutoComplete(props: {
         options={fetcher.asList}
         className={props.className}
         onBlur={() => {
-          if(props.freeSolo && value.name !== search) {
+          if (props.freeSolo && value.name !== search) {
             const v = newOption(search);
             setValue(v);
             props.onChange(v);
           }
 
-          if(props.onCancel) props.onCancel();
+          if (props.onCancel) props.onCancel();
         }}
         onInputChange={(event, newInputValue) => {
           setSearch(newInputValue);
