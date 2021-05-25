@@ -14,3 +14,4 @@ export * from './WebSocket';
 export * from './BrowserWindowId';
 export * from './Debug';
 export * from './Download';
+export * from './RefreshOnInterval';
