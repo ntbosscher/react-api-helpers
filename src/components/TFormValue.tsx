@@ -31,9 +31,9 @@ export function TFormValue(props: {
   const styles = useStyles();
 
   const ctx = useContext(TFormContext);
-  const [value, setValue] = useState<string>();
-  const [debouncedValue] = useDebounce(value, props.debounce || 0);
   const parentValue = ctx.initialValue ? ctx.initialValue[props.objKey] : '';
+  const [value, setValue] = useState<string>(parentValue);
+  const [debouncedValue] = useDebounce(value, props.debounce || 0);
 
   useEffect(() => {
     setValue(parentValue);
