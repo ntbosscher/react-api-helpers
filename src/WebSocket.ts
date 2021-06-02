@@ -39,7 +39,7 @@ export function useWebSocket(
 
     return () => {
       try {
-        if(s.readyState === WebSocket.CLOSED || s.readyState === WebSocket.CLOSING) {
+        if (s.readyState === WebSocket.CLOSED || s.readyState === WebSocket.CLOSING) {
           return;
         }
 
