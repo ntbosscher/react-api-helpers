@@ -37,6 +37,7 @@ export function useWebSocket(
 
     return () => {
       try {
+        console.debug('useWebSocket: close() ', refresh, path, isAuthenticated);
         s.close();
       } catch (e) {}
     };
