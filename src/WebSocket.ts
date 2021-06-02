@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { browserWindowId } from './BrowserWindowId';
 import { useAuthenticated } from './Auth';
 
@@ -11,7 +11,9 @@ export function useWebSocket(
     onClose?(socket: WebSocket, e: Event): void;
   },
 ) {
-  const { onOpen, onClose } = props || {};
+  const propsRef = useRef(props);
+  propsRef.current = props;
+
   const [refresh, setRefresh] = useState(false);
   const [socket, setSocket] = useState<WebSocket | undefined>();
   const [ready, setReady] = useState(false);
@@ -37,7 +39,10 @@ export function useWebSocket(
 
     return () => {
       try {
-        console.debug('useWebSocket: close() ', refresh, path, isAuthenticated);
+        if(s.readyState === WebSocket.CLOSED || s.readyState === WebSocket.CLOSING) {
+          return;
+        }
+
         s.close();
       } catch (e) {}
     };
@@ -49,15 +54,15 @@ export function useWebSocket(
     const callback = (e: Event) => {
       setReady(true);
 
-      if (!onOpen) return;
-      onOpen(socket, e);
+      if (!propsRef.current?.onOpen) return;
+      propsRef.current.onOpen(socket, e);
     };
 
     socket.addEventListener('open', callback);
     return () => {
       socket.removeEventListener('open', callback);
     };
-  }, [socket, onOpen]);
+  }, [socket, propsRef]);
 
   useEffect(() => {
     if (!socket) return;
@@ -65,7 +70,7 @@ export function useWebSocket(
 
     socket.addEventListener('close', (e) => {
       setReady(false);
-      if (onClose) onClose(socket, e);
+      if (propsRef.current?.onClose) propsRef.current.onClose(socket, e);
 
       timeout = setTimeout(
         () => {
@@ -78,7 +83,7 @@ export function useWebSocket(
     return () => {
       if (timeout) clearTimeout(timeout);
     };
-  }, [socket, onClose]);
+  }, [socket, propsRef]);
 
   useEffect(() => {
     if (!socket) return;
