@@ -48,7 +48,13 @@ export function TTextField<T>(props: {
   const { phone, email } = props;
 
   return (
-    <TFormValue label={props.label} objKey={props.objKey as any} debounce={200} noBottomMargin={props.noBottomMargin}>
+    <TFormValue
+      label={props.label}
+      obj={props.obj}
+      objKey={props.objKey}
+      debounce={200}
+      noBottomMargin={props.noBottomMargin}
+    >
       {(p) => (
         <TextField
           label={props.label}
@@ -75,7 +81,7 @@ export function TTextField<T>(props: {
             [styles.textWithMargin]: !props.noBottomMargin,
           })}
           fullWidth={true}
-          defaultValue={p.initialValue}
+          value={p.value}
           onChange={(e) => p.onChange(e.target.value)}
         />
       )}

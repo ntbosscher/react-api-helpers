@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import Typography from '@material-ui/core/Typography';
-import React, { useContext, useState, useEffect } from 'react';
-import { TFormContext } from './TForm';
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { FormObj, TFormContext } from './TForm';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useDebounce } from 'use-debounce';
 
@@ -16,32 +16,48 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface Props {
-  initialValue: string;
+  value: string;
   onChange(value: any): void;
 }
 
-export function TFormValue(props: {
-  objKey: any;
+type UserForm<T> = {
+  update(key: keyof T, value: any): void;
+};
+
+export type UserChangeCallback<T> = (value: any, form: UserForm<T>) => void;
+
+export function TFormValue<T extends FormObj>(props: {
+  obj: T; // just for type-inferencing
+  objKey: keyof T;
   label?: string;
   noBottomMargin?: boolean;
   debounce?: number;
+  onChange?: UserChangeCallback<T>;
   displayValue?: (input: any) => JSX.Element;
   children: (p: Props) => JSX.Element;
 }) {
   const styles = useStyles();
 
   const ctx = useContext(TFormContext);
-  const parentValue = ctx.initialValue ? ctx.initialValue[props.objKey] : '';
-  const [value, setValue] = useState<string>(parentValue);
+  const [value, setValue] = useState<string>(ctx.value[props.objKey]);
   const [debouncedValue] = useDebounce(value, props.debounce || 0);
 
   useEffect(() => {
-    setValue(parentValue);
-  }, [parentValue]);
+    return ctx.subscribeToChanges(props.objKey as string, (value) => {
+      setValue(value);
+    });
+  }, [ctx]);
 
   useEffect(() => {
-    ctx.update(props.objKey, debouncedValue);
+    ctx.inputUpdated(props.objKey as string, debouncedValue);
   }, [debouncedValue]);
+
+  useEffect(() => {
+    if (!props.onChange) return;
+    props.onChange(debouncedValue, {
+      update: ctx.triggerUpdate,
+    });
+  }, [debouncedValue, props.onChange]);
 
   if (!ctx.editing) {
     return (
@@ -52,15 +68,13 @@ export function TFormValue(props: {
         })}
       >
         {props.label && <Typography className={styles.label}>{props.label}</Typography>}
-        <Typography variant="body1">
-          {(props.displayValue ? props.displayValue(parentValue) : parentValue) || '-'}
-        </Typography>
+        <Typography variant="body1">{(props.displayValue ? props.displayValue(value) : value) || '-'}</Typography>
       </div>
     );
   }
 
   return props.children({
-    initialValue: value || '',
+    value: value || '',
     onChange: setValue,
   });
 }

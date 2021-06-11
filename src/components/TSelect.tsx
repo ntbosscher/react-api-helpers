@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { TFormValue } from './TFormValue';
+import { TFormValue, UserChangeCallback } from './TFormValue';
 import { first } from '../ArrayUtils';
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +15,7 @@ export function TSelect<T>(props: {
   label: string;
   obj: T;
   objKey: keyof T;
+  onChange?: UserChangeCallback<T>;
   children: JSX.Element[];
   variant?: 'filled' | 'outlined';
   required?: boolean;
@@ -24,8 +25,10 @@ export function TSelect<T>(props: {
 
   return (
     <TFormValue
+      obj={props.obj}
       objKey={props.objKey}
       label={props.label}
+      onChange={props.onChange}
       displayValue={(e) => {
         if (props.displayValue) {
           return props.displayValue(e);
@@ -48,7 +51,7 @@ export function TSelect<T>(props: {
           </InputLabel>
           <Select
             required={props.required}
-            defaultValue={p.initialValue}
+            value={p.value}
             onChange={(event) => {
               p.onChange(event.target.value as any);
             }}

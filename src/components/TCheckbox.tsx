@@ -14,12 +14,17 @@ export function TCheckbox<T>(props: {
   const noText = props.noText || 'No';
 
   return (
-    <TFormValue objKey={props.objKey} label={props.label} displayValue={(v) => <>{v ? yesText : noText}</>}>
+    <TFormValue
+      obj={props.obj}
+      objKey={props.objKey}
+      label={props.label}
+      displayValue={(v) => <>{v ? yesText : noText}</>}
+    >
       {(p) => (
         <FormControlLabel
           control={
             <Checkbox
-              checked={!!p.initialValue}
+              checked={!!p.value}
               onChange={(e) => {
                 p.onChange(e.target.checked);
               }}
