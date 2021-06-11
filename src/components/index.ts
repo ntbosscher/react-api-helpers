@@ -6,3 +6,4 @@ export * from './TSnackbar';
 export * from './TCheckbox';
 export * from './TSelect';
 export * from './UAutoComplete';
+export * from './USelect';
