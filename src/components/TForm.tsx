@@ -59,13 +59,13 @@ export function TForm<T extends FormObj>(
         const sub = events.current.subscribe((input) => {
           // global update
           if (input.key === undefined) {
-            callback(obj[k]);
+            callback(obj.current[k]);
             return;
           }
 
           // scoped change to this input
           if (input.key === k) {
-            callback(obj[k]);
+            callback(obj.current[k]);
           }
         });
 

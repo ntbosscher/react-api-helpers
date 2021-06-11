@@ -26,6 +26,15 @@ type UserForm<T> = {
 
 export type UserChangeCallback<T> = (value: any, form: UserForm<T>) => void;
 
+function useDebounceHelper(value: any, debounce?: number) {
+  if (!debounce) {
+    return value;
+  }
+
+  const [db] = useDebounce(value, debounce || 0);
+  return db;
+}
+
 export function TFormValue<T extends FormObj>(props: {
   obj: T; // just for type-inferencing
   objKey: keyof T;
@@ -39,8 +48,10 @@ export function TFormValue<T extends FormObj>(props: {
   const styles = useStyles();
 
   const ctx = useContext(TFormContext);
-  const [value, setValue] = useState<string>(ctx.value[props.objKey]);
-  const [debouncedValue] = useDebounce(value, props.debounce || 0);
+  const [value, setValue] = useState<string>();
+
+  const debouncedValue = useDebounceHelper(value, props.debounce || 0);
+  const calculatedValue = (value !== undefined ? value : ctx.value[props.objKey]) || '';
 
   useEffect(() => {
     return ctx.subscribeToChanges(props.objKey as string, (value) => {
@@ -49,11 +60,13 @@ export function TFormValue<T extends FormObj>(props: {
   }, [ctx]);
 
   useEffect(() => {
+    if (debouncedValue === undefined) return;
     ctx.inputUpdated(props.objKey as string, debouncedValue);
   }, [debouncedValue]);
 
   useEffect(() => {
     if (!props.onChange) return;
+    if (debouncedValue === undefined) return;
     props.onChange(debouncedValue, {
       update: ctx.triggerUpdate,
     });
@@ -68,13 +81,15 @@ export function TFormValue<T extends FormObj>(props: {
         })}
       >
         {props.label && <Typography className={styles.label}>{props.label}</Typography>}
-        <Typography variant="body1">{(props.displayValue ? props.displayValue(value) : value) || '-'}</Typography>
+        <Typography variant="body1">
+          {(props.displayValue ? props.displayValue(calculatedValue) : calculatedValue) || '-'}
+        </Typography>
       </div>
     );
   }
 
   return props.children({
-    value: value || '',
+    value: calculatedValue || '',
     onChange: setValue,
   });
 }
