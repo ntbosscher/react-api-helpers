@@ -151,6 +151,26 @@ export function orderByDescending<T>(list: T[], selector: (item: T) => number): 
   list.sort((a, b) => selector(b) - selector(a));
 }
 
+export function orderByStrAscending<T>(list: T[], selector: (item: T) => string) {
+  list.sort((a, b) => {
+    const aVal = selector(a);
+    const bVal = selector(b);
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+    return 0;
+  });
+}
+
+export function orderByStrDescending<T>(list: T[], selector: (item: T) => string) {
+  list.sort((a, b) => {
+    const aVal = selector(a);
+    const bVal = selector(b);
+    if (aVal < bVal) return 1;
+    if (aVal > bVal) return -1;
+    return 0;
+  });
+}
+
 export function last<T>(items: T[], selector: (item: T) => boolean): T | null {
   for (let i = items.length - 1; i >= 0; i--) {
     if (selector(items[i])) return items[i];
