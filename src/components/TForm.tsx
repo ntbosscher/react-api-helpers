@@ -18,10 +18,12 @@ export const TFormContext = createContext({
 });
 
 export type FormObj = { [k: string]: any };
+const blankCallback = () => {};
 
 export function TForm<T extends FormObj>(
   props: PropsWithChildren<{
     onSubmit: (value: T) => void;
+    onChange?: (value: T) => void;
     value: T;
     editing: boolean;
   }>,
@@ -40,12 +42,16 @@ export function TForm<T extends FormObj>(
     events.current.emit({ value: null });
   }, [props.value]);
 
+  const onChangeRef = useRef(props.onChange || blankCallback);
+  onChangeRef.current = props.onChange || blankCallback;
+
   const ctx = useMemo(
     () => ({
       value: obj.current,
       // the input responsible for this key triggered an update
       inputUpdated: (key: keyof T, newValue) => {
         obj.current[key] = newValue;
+        onChangeRef.current(obj.current);
       },
       // someone else triggered an update
       triggerUpdate: (key: keyof T, value) => {
@@ -54,6 +60,7 @@ export function TForm<T extends FormObj>(
           key: key as string,
           value: value,
         });
+        onChangeRef.current(obj.current);
       },
       subscribeToChanges(k: string, callback: (value: any) => void): CancelFunc {
         const sub = events.current.subscribe((input) => {
@@ -73,7 +80,7 @@ export function TForm<T extends FormObj>(
       },
       editing: props.editing,
     }),
-    [props.editing, obj.current, refresh],
+    [props.editing, obj.current, refresh, props.onChange],
   );
 
   return (
