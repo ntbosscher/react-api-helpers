@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
 import { useDebounce } from 'use-debounce';
@@ -29,6 +29,7 @@ export function UAutoComplete(props: {
   shrinkLabel?: boolean;
   freeSolo?: boolean;
   disabled?: boolean;
+  clearOnFocus?: boolean;
   onCancel?(): void;
   onKeyDown?(e: KeyboardEvent): void;
   onChange(value: UElement): void;
@@ -50,6 +51,9 @@ export function UAutoComplete(props: {
       } as UElement),
   );
 
+  const valueRef = useRef(value);
+  const searchRef = useRef("");
+
   return (
     <>
       <Autocomplete
@@ -60,7 +64,14 @@ export function UAutoComplete(props: {
         options={fetcher.asList}
         className={props.className}
         onBlur={() => {
-          if (props.freeSolo && value.name !== search) {
+          if (props.freeSolo && valueRef.current.name !== searchRef.current) {
+            const srcList = fetcher.asList.filter(l => l.name === search);
+            if(srcList.length >= 1) {
+              setValue(srcList[0]);
+              props.onChange(srcList[0]);
+              return;  
+            }
+
             const v = newOption(search);
             setValue(v);
             props.onChange(v);
@@ -70,6 +81,7 @@ export function UAutoComplete(props: {
         }}
         onInputChange={(event, newInputValue) => {
           setSearch(newInputValue);
+          searchRef.current = newInputValue;
         }}
         filterOptions={(options, params) => {
           const filtered = options.slice(0);
@@ -87,18 +99,23 @@ export function UAutoComplete(props: {
         }}
         selectOnFocus
         onChange={(e, newValue) => {
+
           if (newValue === null || newValue === undefined) return;
           if (typeof newValue === 'string') {
             return;
           }
 
+          searchRef.current = newValue.name;
+
           if (newValue.id === -1) {
             const v = newOption((newValue as any).inputValue as string);
+            valueRef.current = v;
             setValue(v);
             props.onChange(v);
             return;
           }
 
+          valueRef.current = newValue;
           setValue(newValue);
           props.onChange(newValue);
         }}
@@ -119,9 +136,11 @@ export function UAutoComplete(props: {
                   // @ts-ignore
                   inputProps.onFocus(e);
 
-                  e.target.value = '';
-                  // @ts-ignore
-                  inputProps.onChange(e);
+                  if(props.clearOnFocus === undefined || props.clearOnFocus === true) {
+                    e.target.value = '';
+                    // @ts-ignore
+                    inputProps.onChange(e);
+                  }
                 },
               })}
               InputProps={Object.assign({}, InputProps, {
