@@ -52,7 +52,7 @@ export function UAutoComplete(props: {
   );
 
   const valueRef = useRef(value);
-  const searchRef = useRef("");
+  const searchRef = useRef('');
 
   return (
     <>
@@ -65,11 +65,11 @@ export function UAutoComplete(props: {
         className={props.className}
         onBlur={() => {
           if (props.freeSolo && valueRef.current.name !== searchRef.current) {
-            const srcList = fetcher.asList.filter(l => l.name === search);
-            if(srcList.length >= 1) {
+            const srcList = fetcher.asList.filter((l) => l.name === search);
+            if (srcList.length >= 1) {
               setValue(srcList[0]);
               props.onChange(srcList[0]);
-              return;  
+              return;
             }
 
             const v = newOption(search);
@@ -99,7 +99,6 @@ export function UAutoComplete(props: {
         }}
         selectOnFocus
         onChange={(e, newValue) => {
-
           if (newValue === null || newValue === undefined) return;
           if (typeof newValue === 'string') {
             return;
@@ -136,7 +135,7 @@ export function UAutoComplete(props: {
                   // @ts-ignore
                   inputProps.onFocus(e);
 
-                  if(props.clearOnFocus === undefined || props.clearOnFocus === true) {
+                  if (props.clearOnFocus === undefined || props.clearOnFocus === true) {
                     e.target.value = '';
                     // @ts-ignore
                     inputProps.onChange(e);
