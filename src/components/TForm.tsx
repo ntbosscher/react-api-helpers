@@ -77,7 +77,7 @@ export function TForm<T extends FormObj>(
       },
       subscribeToExternalChanges(k: string, callback: (value: any) => void): CancelFunc {
         const sub = events.current.subscribe((input) => {
-          if(!input.external) return;
+          if (!input.external) return;
 
           // global update
           if (input.key === undefined) {
@@ -94,9 +94,8 @@ export function TForm<T extends FormObj>(
         return sub.cancel as CancelFunc;
       },
       subscribeToChanges(k: string, callback: (value: any) => void, internalOnly: boolean = true): CancelFunc {
-
         const sub = events.current.subscribe((input) => {
-          if(internalOnly && input.external) return;
+          if (internalOnly && input.external) return;
 
           // global update
           if (input.key === undefined) {
