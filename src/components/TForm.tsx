@@ -17,7 +17,7 @@ export const TFormContext = createContext({
   subscribeToAllChanges(k: string, callback: (value: any) => void): CancelFunc {
     return () => {};
   },
-  subscribeToChanges(k: string, callback: (value: any) => void, internalOnly: boolean = true): CancelFunc {
+  subscribeToChanges(k: string, callback: (value: any) => void, externalOnly: boolean = true): CancelFunc {
     // legacy
     return () => {};
   },
@@ -93,9 +93,9 @@ export function TForm<T extends FormObj>(
 
         return sub.cancel as CancelFunc;
       },
-      subscribeToChanges(k: string, callback: (value: any) => void, internalOnly: boolean = true): CancelFunc {
+      subscribeToChanges(k: string, callback: (value: any) => void, externalOnly: boolean = true): CancelFunc {
         const sub = events.current.subscribe((input) => {
-          if (internalOnly && input.external) return;
+          if (externalOnly && !input.external) return;
 
           // global update
           if (input.key === undefined) {
