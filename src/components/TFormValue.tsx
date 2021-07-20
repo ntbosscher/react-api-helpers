@@ -54,7 +54,7 @@ export function TFormValue<T extends FormObj>(props: {
   const calculatedValue = (value !== undefined ? value : ctx.value[props.objKey]) || '';
 
   useEffect(() => {
-    return ctx.subscribeToChanges(props.objKey as string, (value) => {
+    return ctx.subscribeToExternalChanges(props.objKey as string, (value) => {
       setValue(value);
     });
   }, [ctx]);

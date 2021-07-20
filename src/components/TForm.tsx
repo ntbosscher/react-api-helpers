@@ -11,7 +11,14 @@ export const TFormContext = createContext({
   triggerUpdate: (k: string, value: any) => {
     console.error('missing <TForm>');
   },
-  subscribeToChanges(k: string, callback: (value: any) => void): CancelFunc {
+  subscribeToExternalChanges(k: string, callback: (value: any) => void): CancelFunc {
+    return () => {};
+  },
+  subscribeToAllChanges(k: string, callback: (value: any) => void): CancelFunc {
+    return () => {};
+  },
+  subscribeToChanges(k: string, callback: (value: any) => void, internalOnly: boolean = true): CancelFunc {
+    // legacy
     return () => {};
   },
   editing: false,
@@ -31,7 +38,7 @@ export function TForm<T extends FormObj>(
   const obj = useRef(props.value);
 
   // pass change events to targeted child elements
-  const events = useRef(new EventEmitter<{ key?: string; value: any }>());
+  const events = useRef(new EventEmitter<{ key?: string; external: boolean; value: any }>());
 
   // trigger refresh when props.value changes
   const [refresh, setRefresh] = useState(props.value);
@@ -39,7 +46,7 @@ export function TForm<T extends FormObj>(
   useEffect(() => {
     obj.current = props.value;
     setRefresh(props.value);
-    events.current.emit({ value: null });
+    events.current.emit({ value: null, external: true });
   }, [props.value]);
 
   const onChangeRef = useRef(props.onChange || blankCallback);
@@ -51,18 +58,61 @@ export function TForm<T extends FormObj>(
       // the input responsible for this key triggered an update
       inputUpdated: (key: keyof T, newValue) => {
         obj.current[key] = newValue;
+        events.current.emit({
+          external: false,
+          key: key as string,
+          value: newValue,
+        });
         onChangeRef.current(obj.current);
       },
       // someone else triggered an update
       triggerUpdate: (key: keyof T, value) => {
         obj.current[key] = value;
         events.current.emit({
+          external: true,
           key: key as string,
           value: value,
         });
         onChangeRef.current(obj.current);
       },
-      subscribeToChanges(k: string, callback: (value: any) => void): CancelFunc {
+      subscribeToExternalChanges(k: string, callback: (value: any) => void): CancelFunc {
+        const sub = events.current.subscribe((input) => {
+          if(!input.external) return;
+
+          // global update
+          if (input.key === undefined) {
+            callback(obj.current[k]);
+            return;
+          }
+
+          // scoped change to this input
+          if (input.key === k) {
+            callback(obj.current[k]);
+          }
+        });
+
+        return sub.cancel as CancelFunc;
+      },
+      subscribeToChanges(k: string, callback: (value: any) => void, internalOnly: boolean = true): CancelFunc {
+
+        const sub = events.current.subscribe((input) => {
+          if(internalOnly && input.external) return;
+
+          // global update
+          if (input.key === undefined) {
+            callback(obj.current[k]);
+            return;
+          }
+
+          // scoped change to this input
+          if (input.key === k) {
+            callback(obj.current[k]);
+          }
+        });
+
+        return sub.cancel as CancelFunc;
+      },
+      subscribeToAllChanges(k: string, callback: (value: any) => void): CancelFunc {
         const sub = events.current.subscribe((input) => {
           // global update
           if (input.key === undefined) {
