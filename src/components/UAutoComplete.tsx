@@ -65,6 +65,13 @@ export function UAutoComplete(props: {
         className={props.className}
         onBlur={() => {
           if (props.freeSolo && valueRef.current.name !== searchRef.current) {
+            const srcList = fetcher.asList.filter(l => l.name === search);
+            if(srcList.length >= 1) {
+              setValue(srcList[0]);
+              props.onChange(srcList[0]);
+              return;  
+            }
+
             const v = newOption(search);
             setValue(v);
             props.onChange(v);
