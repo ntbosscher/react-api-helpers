@@ -38,6 +38,7 @@ export function TTextField<T>(props: {
   obj: T;
   placeholder?: string;
   noBottomMargin?: boolean;
+  disabled?: boolean
   phone?: boolean;
   email?: boolean;
   required?: boolean;
@@ -80,6 +81,7 @@ export function TTextField<T>(props: {
             [styles.text]: true,
             [styles.textWithMargin]: !props.noBottomMargin,
           })}
+          disabled={props.disabled}
           fullWidth={true}
           value={p.value}
           onChange={(e) => p.onChange(e.target.value)}

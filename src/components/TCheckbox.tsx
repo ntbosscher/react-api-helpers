@@ -6,6 +6,7 @@ export function TCheckbox<T>(props: {
   obj: T;
   objKey: keyof T;
   required?: boolean;
+  disabled?: boolean;
   label?: string;
   yesText?: string;
   noText?: string;
@@ -24,6 +25,7 @@ export function TCheckbox<T>(props: {
         <FormControlLabel
           control={
             <Checkbox
+              disabled={props.disabled}
               checked={!!p.value}
               onChange={(e) => {
                 p.onChange(e.target.checked);

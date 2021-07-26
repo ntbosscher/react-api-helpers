@@ -17,6 +17,7 @@ export function TSelect<T>(props: {
   objKey: keyof T;
   onChange?: UserChangeCallback<T>;
   children: JSX.Element[];
+  disabled?: boolean
   variant?: 'filled' | 'outlined';
   required?: boolean;
   displayValue?: (value: any) => JSX.Element;
@@ -50,6 +51,7 @@ export function TSelect<T>(props: {
             {props.label}
           </InputLabel>
           <Select
+            disabled={props.disabled}
             required={props.required}
             value={p.value}
             onChange={(event) => {
