@@ -38,7 +38,7 @@ export function TTextField<T>(props: {
   obj: T;
   placeholder?: string;
   noBottomMargin?: boolean;
-  disabled?: boolean
+  disabled?: boolean;
   phone?: boolean;
   email?: boolean;
   required?: boolean;
