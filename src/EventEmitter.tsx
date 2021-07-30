@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 type Callback<T> = (input: T) => void;
 
 export type Subscription = {
@@ -72,5 +74,19 @@ export class EventEmitter<T> {
     });
 
     this.lastValue = value;
+  }
+
+  static reactValue<T>(emitter?: EventEmitter<T>) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [value, setValue] = useState<T | undefined>(emitter?.lastValue);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (!emitter) return;
+      const sub = emitter.subscribe(setValue);
+      return () => sub.cancel();
+    }, [emitter]);
+
+    return value;
   }
 }
