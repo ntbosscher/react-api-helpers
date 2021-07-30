@@ -98,3 +98,9 @@ export function PublicProducts() {
     )
 }
 ```
+
+## FAQ
+
+crypto.getRandomValues() not supported...
+- Ensure you've imported `react-native-get-random-values` prior to importing any API-related 
+files from this package
