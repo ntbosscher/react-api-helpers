@@ -64,6 +64,8 @@ export function useWebSocket(
     };
   }, [socket, propsRef]);
 
+  const lastRefreshRef = useRef([]);
+
   useEffect(() => {
     if (!socket) return;
     let timeout: any = 0;
@@ -72,11 +74,23 @@ export function useWebSocket(
       setReady(false);
       if (propsRef.current?.onClose) propsRef.current.onClose(socket, e);
 
+      let retryIn = 1000;
+      if(e.code === 1006) {
+        retryIn = 10 * 1000;
+
+        const now = new Date().getTime();
+        const last5min = lastRefreshRef.current.filter(r => r > now - 5 * 60 * 1000);
+        if(last5min.length > 5) {
+          retryIn = 30 * 1000;
+        }
+      }
+
       timeout = setTimeout(
         () => {
+          lastRefreshRef.current.push(new Date().getTime());
           setRefresh((old) => !old);
         },
-        e.code === 1006 ? 5 * 60 * 1000 : 1000,
+        retryIn,
       );
     });
 
