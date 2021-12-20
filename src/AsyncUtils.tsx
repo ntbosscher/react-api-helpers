@@ -1,11 +1,11 @@
 import { ErrResponse } from './Fetcher';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Loading } from './Loading';
-import { Grid } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import { Grid } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { useAuthenticated } from './Auth';
-import green from '@material-ui/core/colors/green';
+import green from '@mui/material/colors/green';
 
 type DefaultLister<T> = T extends Array<any> ? { asList: T extends (infer U)[] ? U[] : never } : { asList: never };
 

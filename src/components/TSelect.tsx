@@ -1,14 +1,7 @@
 import * as React from 'react';
-import { FormControl, InputLabel, Select } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import { TFormValue, UserChangeCallback } from './TFormValue';
 import { first } from '../ArrayUtils';
-
-const useStyles = makeStyles((theme) => ({
-  wrapper: {
-    marginBottom: 4,
-  },
-}));
+import { FormControl, InputLabel, Select } from '@mui/material';
 
 export function TSelect<T>(props: {
   style?: React.CSSProperties;
@@ -22,7 +15,6 @@ export function TSelect<T>(props: {
   required?: boolean;
   displayValue?: (value: any) => JSX.Element;
 }) {
-  const styles = useStyles();
 
   return (
     <TFormValue
@@ -41,7 +33,7 @@ export function TSelect<T>(props: {
       }}
     >
       {(p) => (
-        <FormControl className={styles.wrapper} style={props.style} variant={props.variant || 'filled'} fullWidth>
+        <FormControl style={Object.assign({marginBottom: 4}, props.style)} variant={props.variant || 'filled'} fullWidth>
           <InputLabel
             style={props.variant === 'outlined' ? { backgroundColor: 'white' } : undefined}
             variant={props.variant || 'filled'}

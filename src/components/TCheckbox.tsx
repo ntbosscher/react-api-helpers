@@ -1,6 +1,6 @@
-import { Checkbox, FormControlLabel } from '@material-ui/core';
 import * as React from 'react';
 import { TFormValue } from './TFormValue';
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 export function TCheckbox<T>(props: {
   obj: T;
@@ -32,7 +32,7 @@ export function TCheckbox<T>(props: {
               }}
             />
           }
-          label={props.label}
+          label={props.label || <>{null}</>}
         />
       )}
     </TFormValue>

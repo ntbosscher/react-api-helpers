@@ -1,18 +1,11 @@
 import clsx from 'clsx';
-import Typography from '@material-ui/core/Typography';
 import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { FormObj, TFormContext } from './TForm';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useDebounce } from 'use-debounce';
+import { styled, Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  text: {},
-  textWithMargin: {
-    marginBottom: theme.spacing(2),
-  },
-  label: {
-    fontSize: '0.7rem',
-  },
+const Wrapper = styled("div")<{marginBottom: boolean}>(({marginBottom, theme}) => ({
+  marginBottom: theme.spacing(2),
 }));
 
 interface Props {
@@ -45,8 +38,6 @@ export function TFormValue<T extends FormObj>(props: {
   displayValue?: (input: any) => JSX.Element;
   children: (p: Props) => JSX.Element;
 }) {
-  const styles = useStyles();
-
   const ctx = useContext(TFormContext);
   const [value, setValue] = useState<string>();
 
@@ -74,17 +65,12 @@ export function TFormValue<T extends FormObj>(props: {
 
   if (!ctx.editing) {
     return (
-      <div
-        className={clsx({
-          [styles.text]: true,
-          [styles.textWithMargin]: !props.noBottomMargin,
-        })}
-      >
-        {props.label && <Typography className={styles.label}>{props.label}</Typography>}
+      <Wrapper marginBottom={!props.noBottomMargin}>
+        {props.label && <Typography style={{fontSize: '0.7rem'}}>{props.label}</Typography>}
         <Typography variant="body1">
           {(props.displayValue ? props.displayValue(calculatedValue) : calculatedValue) || '-'}
         </Typography>
-      </div>
+      </Wrapper>
     );
   }
 

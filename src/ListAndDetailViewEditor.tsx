@@ -1,13 +1,7 @@
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
-import Typography from '@material-ui/core/Typography';
-import { Grid, TextField } from '@material-ui/core';
-import Card from '@material-ui/core/Card';
-import List from '@material-ui/core/List';
 import { AsyncResult } from './AsyncUtils';
 import React, { useState, useEffect } from 'react';
+import { Card, Fab, Grid, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
+import { Add } from '@mui/icons-material';
 
 export function ListAndDetailViewEditor<T>(props: {
   list: AsyncResult<T[]>;
@@ -84,7 +78,7 @@ export function ListAndDetailViewEditor<T>(props: {
             <Grid item style={{ textAlign: 'right' }}>
               <div style={{ padding: 16 }}>
                 <Fab color="primary" aria-label="add" onClick={() => setCreateNew(true)}>
-                  <AddIcon />
+                  <Add />
                 </Fab>
               </div>
             </Grid>

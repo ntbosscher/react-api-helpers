@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { FormControl, InputLabel, Select, SelectProps } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { FormControl, InputLabel, Select, SelectProps, styled } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  wrapper: {
-    marginBottom: 4,
-  },
-}));
+
+const StyledFormControl = styled(FormControl)(() => ({
+  marginBottom: 4,
+}))
 
 export function USelect<T>(
   props: {
@@ -16,10 +14,9 @@ export function USelect<T>(
     children: JSX.Element[];
   } & Omit<SelectProps, 'onChange'>,
 ) {
-  const styles = useStyles();
 
   return (
-    <FormControl className={styles.wrapper} style={props.style} variant={props.variant || 'filled'} fullWidth>
+    <StyledFormControl style={props.style} variant={props.variant || 'filled'} fullWidth>
       <InputLabel
         style={props.variant === 'outlined' ? { backgroundColor: 'white' } : undefined}
         variant={props.variant || 'filled'}
@@ -31,6 +28,6 @@ export function USelect<T>(
       <Select {...props} onChange={(e) => props.onChange && props.onChange(e.target.value)}>
         {props.children}
       </Select>
-    </FormControl>
+    </StyledFormControl>
   );
 }

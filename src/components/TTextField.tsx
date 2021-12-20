@@ -1,18 +1,6 @@
 import React from 'react';
-import { TextField } from '@material-ui/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import clsx from 'clsx';
 import { TFormValue } from './TFormValue';
-
-const useStyles = makeStyles((theme) => ({
-  text: {
-    minWidth: 100,
-    marginBottom: theme.spacing(0.5),
-  },
-  textWithMargin: {
-    marginBottom: theme.spacing(2),
-  },
-}));
+import { TextField } from '@mui/material';
 
 function autoFormat(raw: string, phone?: boolean, email?: boolean): string {
   if (phone) {
@@ -45,7 +33,6 @@ export function TTextField<T>(props: {
   password?: boolean;
   width?: string;
 }) {
-  const styles = useStyles();
   const { phone, email } = props;
 
   return (
@@ -74,13 +61,12 @@ export function TTextField<T>(props: {
           }}
           style={{
             width: props.width,
-            minWidth: props.width !== undefined ? '0' : undefined,
+            minWidth: props.width !== undefined ? '0' : 100,
+          }}
+          sx={{
+            marginBottom: !props.noBottomMargin ? 2 : 0.5,
           }}
           required={props.required}
-          className={clsx({
-            [styles.text]: true,
-            [styles.textWithMargin]: !props.noBottomMargin,
-          })}
           disabled={props.disabled}
           fullWidth={true}
           value={p.value}

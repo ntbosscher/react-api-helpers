@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { TextField } from '@material-ui/core';
 import { useDebounce } from 'use-debounce';
 import { useAsync2 } from '../AsyncUtils2';
+import { Autocomplete, TextField } from '@mui/material';
 
 interface UElement {
   id: number;
@@ -118,9 +117,8 @@ export function UAutoComplete(props: {
           setValue(newValue);
           props.onChange(newValue);
         }}
-        renderOption={(opt) => opt.name}
+        renderOption={(props, opt) => opt.name}
         getOptionLabel={(opt) => opt.name}
-        getOptionSelected={(opt, value) => opt.id === value.id}
         freeSolo={props.freeSolo}
         blurOnSelect
         renderInput={(params) => {

@@ -1,6 +1,5 @@
-import { Button, ButtonProps } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import React from 'react';
+import { Button, ButtonProps, CircularProgress } from '@mui/material';
 
 export function LoadableButton(props: ButtonProps & { loading: boolean }) {
   let { children, loading, disabled, ...other } = props;

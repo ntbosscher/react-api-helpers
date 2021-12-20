@@ -62,7 +62,7 @@ function LoginModal() {
 import {useAsync} from "nate-react-api-helpers/AsyncUtils";
 import {api} from "../api/API";
 import React from "react";
-import {Grid} from "@material-ui/core";
+import {Grid} from "@mui/material";
 
 export function Customers() {
     const customers = useAsync(() => api.getCustomers());

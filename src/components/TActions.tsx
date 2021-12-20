@@ -1,10 +1,9 @@
-import { Grid } from '@material-ui/core';
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import { Button, Grid } from '@mui/material';
 
 export function TActions(props: { loadingOrError: JSX.Element | null; onCancel?: () => void; confirmText?: string }) {
   return (
-    <Grid container justify="flex-end" spacing={2}>
+    <Grid container justifyContent="flex-end" spacing={2}>
       {props.loadingOrError && <Grid item>{props.loadingOrError}</Grid>}
       {props.onCancel && (
         <Grid item>
