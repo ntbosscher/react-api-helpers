@@ -49,6 +49,17 @@ export class Fetcher {
     window.location = path;
   }
 
+  getHeaders(add?: {[k: string]: string}) {
+    if(!add || Object.keys(add).length === 0) return this.defaultHeaders;
+
+    const hd = new Headers(this.defaultHeaders);
+    for(let k in add) {
+      hd.set(k, add[k]);
+    }
+
+    return hd;
+  }
+
   async postFormData<T>(path: string, body: { [k: string]: string | Blob }, isRetry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
@@ -59,7 +70,7 @@ export class Fetcher {
 
     const result = await this.fetch(path, {
       method: 'POST',
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       credentials: 'include',
       cache: 'no-cache',
       redirect: 'follow',
@@ -82,7 +93,7 @@ export class Fetcher {
       path,
       {
         method: method,
-        headers: this.defaultHeaders,
+        headers: this.getHeaders(),
         credentials: 'include',
         cache: 'no-cache',
         redirect: 'follow',
@@ -113,7 +124,7 @@ export class Fetcher {
       path,
       {
         method: 'POST',
-        headers: this.defaultHeaders,
+        headers: this.getHeaders(),
         credentials: 'include',
         cache: 'no-cache',
         redirect: 'follow',
@@ -232,7 +243,9 @@ export class Fetcher {
 
     const result = await this.fetch(path, {
       method: 'POST',
-      headers: this.defaultHeaders,
+      headers: this.getHeaders({
+        "Content-Type": "application/json",
+      }),
       credentials: 'include',
       cache: 'no-cache',
       redirect: 'follow',
@@ -247,7 +260,9 @@ export class Fetcher {
 
     const result = await this.fetch(path, {
       method: 'POST',
-      headers: this.defaultHeaders,
+      headers: this.getHeaders({
+        "Content-Type": "application/json",
+      }),
       credentials: 'include',
       cache: 'no-cache',
       body: JSON.stringify(body),
@@ -261,7 +276,9 @@ export class Fetcher {
 
     const result = await this.fetch(path, {
       method: 'PUT',
-      headers: this.defaultHeaders,
+      headers: this.getHeaders({
+        "Content-Type": "application/json",
+      }),
       credentials: 'include',
       cache: 'no-cache',
       redirect: 'follow',
@@ -281,7 +298,7 @@ export class Fetcher {
 
     const result = await this.fetch(fullPath, {
       method: 'GET',
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       credentials: 'include',
       cache: 'no-cache',
       redirect: 'follow',
