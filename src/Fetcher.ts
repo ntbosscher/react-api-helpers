@@ -49,11 +49,11 @@ export class Fetcher {
     window.location = path;
   }
 
-  getHeaders(add?: {[k: string]: string}) {
-    if(!add || Object.keys(add).length === 0) return this.defaultHeaders;
+  getHeaders(add?: { [k: string]: string }) {
+    if (!add || Object.keys(add).length === 0) return this.defaultHeaders;
 
     const hd = new Headers(this.defaultHeaders);
-    for(let k in add) {
+    for (let k in add) {
       hd.set(k, add[k]);
     }
 
@@ -244,7 +244,7 @@ export class Fetcher {
     const result = await this.fetch(path, {
       method: 'POST',
       headers: this.getHeaders({
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       }),
       credentials: 'include',
       cache: 'no-cache',
@@ -261,7 +261,7 @@ export class Fetcher {
     const result = await this.fetch(path, {
       method: 'POST',
       headers: this.getHeaders({
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       }),
       credentials: 'include',
       cache: 'no-cache',
@@ -277,7 +277,7 @@ export class Fetcher {
     const result = await this.fetch(path, {
       method: 'PUT',
       headers: this.getHeaders({
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       }),
       credentials: 'include',
       cache: 'no-cache',

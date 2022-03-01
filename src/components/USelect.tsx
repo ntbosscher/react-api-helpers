@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select, SelectProps, styled } from '@mui/material';
 
-
 const StyledFormControl = styled(FormControl)(() => ({
   marginBottom: 4,
-}))
+}));
 
 export function USelect<T>(
   props: {
@@ -14,7 +13,6 @@ export function USelect<T>(
     children: JSX.Element[];
   } & Omit<SelectProps, 'onChange'>,
 ) {
-
   return (
     <StyledFormControl style={props.style} variant={props.variant || 'filled'} fullWidth>
       <InputLabel

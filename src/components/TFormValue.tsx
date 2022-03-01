@@ -4,7 +4,7 @@ import { FormObj, TFormContext } from './TForm';
 import { useDebounce } from 'use-debounce';
 import { styled, Typography } from '@mui/material';
 
-const Wrapper = styled("div")<{marginBottom: boolean}>(({marginBottom, theme}) => ({
+const Wrapper = styled('div')<{ marginBottom: boolean }>(({ marginBottom, theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
@@ -66,7 +66,7 @@ export function TFormValue<T extends FormObj>(props: {
   if (!ctx.editing) {
     return (
       <Wrapper marginBottom={!props.noBottomMargin}>
-        {props.label && <Typography style={{fontSize: '0.7rem'}}>{props.label}</Typography>}
+        {props.label && <Typography style={{ fontSize: '0.7rem' }}>{props.label}</Typography>}
         <Typography variant="body1">
           {(props.displayValue ? props.displayValue(calculatedValue) : calculatedValue) || '-'}
         </Typography>

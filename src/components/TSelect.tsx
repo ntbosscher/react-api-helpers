@@ -15,7 +15,6 @@ export function TSelect<T>(props: {
   required?: boolean;
   displayValue?: (value: any) => JSX.Element;
 }) {
-
   return (
     <TFormValue
       obj={props.obj}
@@ -33,7 +32,11 @@ export function TSelect<T>(props: {
       }}
     >
       {(p) => (
-        <FormControl style={Object.assign({marginBottom: 4}, props.style)} variant={props.variant || 'filled'} fullWidth>
+        <FormControl
+          style={Object.assign({ marginBottom: 4 }, props.style)}
+          variant={props.variant || 'filled'}
+          fullWidth
+        >
           <InputLabel
             style={props.variant === 'outlined' ? { backgroundColor: 'white' } : undefined}
             variant={props.variant || 'filled'}
