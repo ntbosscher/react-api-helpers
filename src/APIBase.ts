@@ -14,7 +14,7 @@ export class APIBase {
             this.onRefresh.emit(result);
 
             return retry();
-          } catch (e) {
+          } catch (e: any) {
             // continue to access-denied
           }
         }

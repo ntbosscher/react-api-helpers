@@ -196,7 +196,7 @@ export class Fetcher {
             // ignore failures to get the Location header
             // sometimes this happens when it's blocked by CORS
             location = xhr.getResponseHeader('Location');
-          } catch (e) {}
+          } catch (e: any) {}
 
           if (location) {
             if (input.params.redirect === 'follow') {
@@ -218,11 +218,11 @@ export class Fetcher {
         }
 
         if (input.params.body) {
-          xhr.send(input.params.body);
+          xhr.send(input.params.body as any);
         } else {
           xhr.send();
         }
-      } catch (e) {
+      } catch (e: any) {
         reject(e);
       }
     });
@@ -322,7 +322,7 @@ export class Fetcher {
         throw new FetcherError(xhr.status + ' ' + xhr.statusText, { xhr: xhr });
       }
 
-      return (xhr as any) as T;
+      return xhr as any as T;
     }
 
     const jsonData = JSON.parse(xhr.responseText);
@@ -353,7 +353,7 @@ export class Fetcher {
         throw new Error('Not found');
       }
 
-      return (result as any) as T;
+      return result as any as T;
     }
 
     const jsonData = await result.json();

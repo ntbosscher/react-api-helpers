@@ -76,7 +76,7 @@ export function useAsync<T, I>(
         }
 
         setValue(result);
-      } catch (e) {
+      } catch (e: any) {
         setError(e.toString());
       }
 
@@ -196,7 +196,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       setLoading(false);
       setResult(actionResult);
       setShowSuccess(true);
-    } catch (e) {
+    } catch (e: any) {
       setError(e.toString());
       setLoading(false);
     }
@@ -251,7 +251,7 @@ export async function addDevelopmentDelay<T>(p: Promise<T>): Promise<T> {
     const spent = new Date().getTime() - start;
     await sleep(200 * Math.random() + 100 - spent);
     return result;
-  } catch (e) {
+  } catch (e: any) {
     await sleep(200 * Math.random() + 100);
     throw e;
   }

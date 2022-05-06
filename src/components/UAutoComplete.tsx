@@ -117,8 +117,8 @@ export function UAutoComplete(props: {
           setValue(newValue);
           props.onChange(newValue);
         }}
-        renderOption={(props, opt) => opt.name}
-        getOptionLabel={(opt) => opt.name}
+        renderOption={(props, opt) => (typeof opt === 'string' ? opt : opt.name)}
+        getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt.name)}
         freeSolo={props.freeSolo}
         blurOnSelect
         renderInput={(params) => {

@@ -44,7 +44,7 @@ export function useWebSocket(
         }
 
         s.close();
-      } catch (e) {}
+      } catch (e: any) {}
     };
   }, [refresh, path, isAuthenticated]);
 

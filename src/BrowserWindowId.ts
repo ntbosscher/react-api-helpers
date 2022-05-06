@@ -13,7 +13,7 @@ export const browserWindowId: string = (function () {
     window.sessionStorage.setItem(key, value as string);
 
     return value;
-  } catch (e) {
+  } catch (e: any) {
     return uuidv4();
   }
 })();
