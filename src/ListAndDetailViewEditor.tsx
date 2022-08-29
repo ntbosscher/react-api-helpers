@@ -1,7 +1,7 @@
 import { AsyncResult } from './AsyncUtils';
 import React, { useState, useEffect } from 'react';
 import { Card, Fab, Grid, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
 
 export function ListAndDetailViewEditor<T>(props: {
   list: AsyncResult<T[]>;
