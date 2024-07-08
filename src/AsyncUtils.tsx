@@ -113,7 +113,7 @@ export function useAsync<T, I>(
     loading,
     error,
     result: value as T,
-    asList: listValue,
+    asList: listValue as any,
     reload,
   };
 }

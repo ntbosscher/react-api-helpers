@@ -113,6 +113,7 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
 
   const LoadingElement = LoadingEl(loading, error, reload);
   const NoResultElement = NoResultEl(LoadingElement, value);
+  const listValue = !!value && value instanceof Array ? (value as any) : defaultArray;
 
   return {
     LoadingElement,
@@ -122,7 +123,7 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
     loading,
     error,
     result: value,
-    asList: (value as T) || ((defaultArray as any) as T),
+    asList: listValue as any,
     reload,
   };
 }
