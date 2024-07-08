@@ -305,7 +305,7 @@ export class Fetcher {
         throw new FetcherError(xhr.status + ' ' + xhr.statusText, { xhr: xhr });
       }
 
-      return (xhr as any) as T;
+      return xhr as any as T;
     }
 
     const jsonData = JSON.parse(xhr.responseText);
@@ -336,7 +336,7 @@ export class Fetcher {
         throw new Error('Not found');
       }
 
-      return (result as any) as T;
+      return result as any as T;
     }
 
     const jsonData = await result.json();

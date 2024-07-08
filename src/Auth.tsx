@@ -61,12 +61,10 @@ export function AuthProvider(
     return () => sub.cancel();
   }, []);
 
-  const ctx = useMemo(() => ({ authenticated, setAuthenticated, lastPingResult, forcePing: check }), [
-    authenticated,
-    setAuthenticated,
-    lastPingResult,
-    check,
-  ]);
+  const ctx = useMemo(
+    () => ({ authenticated, setAuthenticated, lastPingResult, forcePing: check }),
+    [authenticated, setAuthenticated, lastPingResult, check],
+  );
 
   return <AuthContext.Provider value={ctx}>{props.children}</AuthContext.Provider>;
 }

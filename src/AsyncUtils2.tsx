@@ -21,7 +21,7 @@ export function AsyncCacheProvider(props: PropsWithChildren<{}>) {
 export function useAsyncPaginated<
   TResult extends Array<any>,
   TError extends Error,
-  TArgs extends TypedQueryFunctionArgs
+  TArgs extends TypedQueryFunctionArgs,
 >(
   queryKey: QueryKey,
   queryFn: TypedQueryFunction<TResult, TArgs>,
