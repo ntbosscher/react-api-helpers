@@ -103,6 +103,7 @@ export function useAsync<T, I>(
 
   const LoadingElement = LoadingEl(loading, error, reload);
   const NoResultElement = NoResultEl(LoadingElement, value);
+  const listValue = !!value && value instanceof Array ? (value as any) : defaultArray;
 
   return {
     LoadingElement,
@@ -112,7 +113,7 @@ export function useAsync<T, I>(
     loading,
     error,
     result: value as T,
-    asList: value || (defaultArray as any),
+    asList: listValue,
     reload,
   };
 }
