@@ -1,6 +1,7 @@
 import React from 'react';
 import { TFormValue } from './TFormValue';
 import { TextField } from '@mui/material';
+import { FormObj } from './TForm';
 
 function autoFormat(raw: string, phone?: boolean, email?: boolean): string {
   if (phone) {
@@ -20,7 +21,7 @@ function autoFormat(raw: string, phone?: boolean, email?: boolean): string {
   return raw;
 }
 
-export function TTextField<T>(props: {
+export function TTextField<T extends FormObj>(props: {
   label?: string;
   objKey: keyof T;
   obj: T;
@@ -39,7 +40,7 @@ export function TTextField<T>(props: {
     <TFormValue
       label={props.label}
       obj={props.obj}
-      objKey={props.objKey}
+      objKey={props.objKey as any}
       debounce={200}
       noBottomMargin={props.noBottomMargin}
     >

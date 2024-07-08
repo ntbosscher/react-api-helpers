@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { TFormValue } from './TFormValue';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import { FormObj } from './TForm';
 
-export function TCheckbox<T>(props: {
+export function TCheckbox<T extends FormObj>(props: {
   obj: T;
   objKey: keyof T;
   required?: boolean;

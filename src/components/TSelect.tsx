@@ -2,8 +2,9 @@ import * as React from 'react';
 import { TFormValue, UserChangeCallback } from './TFormValue';
 import { first } from '../ArrayUtils';
 import { FormControl, InputLabel, Select } from '@mui/material';
+import { FormObj } from './TForm';
 
-export function TSelect<T>(props: {
+export function TSelect<T extends FormObj>(props: {
   style?: React.CSSProperties;
   label: string;
   obj: T;
