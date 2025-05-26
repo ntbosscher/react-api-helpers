@@ -353,6 +353,10 @@ export class Fetcher {
         throw new Error('Not found');
       }
 
+      if (result.status >= 400) {
+        throw new FetcherError(result.status + ' ' + result.statusText, { response: result });
+      }
+
       return result as any as T;
     }
 
@@ -370,7 +374,7 @@ export class Fetcher {
   }
 }
 
-type ExtraErrorInfo = { xhr?: XMLHttpRequest };
+type ExtraErrorInfo = { xhr?: XMLHttpRequest, response?: Response };
 
 class FetcherError extends Error {
   info: ExtraErrorInfo;
