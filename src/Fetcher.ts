@@ -374,7 +374,7 @@ export class Fetcher {
   }
 }
 
-type ExtraErrorInfo = { xhr?: XMLHttpRequest, response?: Response };
+type ExtraErrorInfo = { xhr?: XMLHttpRequest; response?: Response };
 
 class FetcherError extends Error {
   info: ExtraErrorInfo;
