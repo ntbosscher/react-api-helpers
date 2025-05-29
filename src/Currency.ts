@@ -16,11 +16,15 @@ export function formatCents(n: Cents | undefined) {
 }
 
 export function parseCents(str: string): number {
-  const parts = str.replace(/,/g, '').split('.');
+  const parts = str.replace(/[^0-9\-.]+/g, '').split('.');
   let dollars = parseInt(parts[0], 10);
   let cents = 0;
   if (parts.length >= 2) {
     cents = parseInt(parts[1].substring(0, 2).padEnd(2, '0'), 10);
+  }
+
+  if(dollars < 0 || str.startsWith("-")) {
+    cents = -cents;
   }
 
   if (isNaN(dollars)) dollars = 0;
