@@ -5,7 +5,7 @@ import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useAuthenticated } from './Auth';
-import green from '@mui/material/colors/green';
+import {green} from '@mui/material/colors';
 
 type DefaultLister<T> = T extends Array<any> ? { asList: T extends (infer U)[] ? U[] : never } : { asList: never };
 
