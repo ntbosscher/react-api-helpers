@@ -1,5 +1,5 @@
 import { ErrResponse } from './Fetcher';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Loading } from './Loading';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -43,33 +43,28 @@ export function useAsync<T, I>(
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isInit, setIsInit] = useState(false);
-  const [_, setLoadId] = useState(0);
 
   const cb = options?.dependsOn ? useCallback(fx, options?.dependsOn) : fx;
+  const reqVersionRef = useRef(0);
 
   const load = useCallback(
     async (input?: any) => {
+
+      if(reqVersionRef.current > 1000) {
+        reqVersionRef.current = 1;
+      }
+
+      reqVersionRef.current++
+      const version = reqVersionRef.current;
+
       try {
         setError(null);
         setLoading(true);
         setIsInit(true);
 
-        let thisLoadId = 0;
-        setLoadId((old) => {
-          thisLoadId = (old + 1) % 1000;
-          return thisLoadId;
-        });
-
         // @ts-ignore
         const result = await addDevelopmentDelay(cb(input));
-
-        let isActiveRequest = true;
-        setLoadId((old) => {
-          isActiveRequest = old === thisLoadId;
-          return old;
-        });
-
-        if (!isActiveRequest) return;
+        if(reqVersionRef.current !== version) return;
 
         if (result && typeof result === 'object') {
           if ('error' in result) throw new Error(result.error);
@@ -77,6 +72,7 @@ export function useAsync<T, I>(
 
         setValue(result);
       } catch (e: any) {
+        if(reqVersionRef.current !== version) return;
         setError(e.toString());
       }
 
@@ -156,7 +152,6 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<T | null>(null);
-  const [_, setLoadId] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // automatically return showSuccess to false after timeout
@@ -170,34 +165,34 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
     return () => clearTimeout(id);
   }, [showSuccess]);
 
+  const reqVersionRef = useRef(0);
+
   const theCallback = useCallback(async (arg) => {
+
+    if(reqVersionRef.current > 1000) {
+      reqVersionRef.current = 1;
+    }
+
+    reqVersionRef.current++
+    const version = reqVersionRef.current;
+
     try {
       setError(null);
       setLoading(true);
-
-      let thisLoadId = 0;
-      setLoadId((old) => {
-        thisLoadId = (old + 1) % 1000;
-        return thisLoadId;
-      });
 
       const actionResult = await addDevelopmentDelay(callback(arg));
       if (actionResult && typeof actionResult === 'object' && 'error' in actionResult) {
         throw new Error((actionResult as any).error);
       }
 
-      let isActiveRequest = true;
-      setLoadId((old) => {
-        isActiveRequest = old === thisLoadId;
-        return old;
-      });
-
-      if (!isActiveRequest) return;
+      if(reqVersionRef.current !== version) return;
 
       setLoading(false);
       setResult(actionResult);
       setShowSuccess(true);
     } catch (e: any) {
+      if(reqVersionRef.current !== version) return;
+
       setError(e.toString());
       setLoading(false);
     }
