@@ -16,6 +16,7 @@ export type AsyncResult<T> = {
   LoadingElement: JSX.Element | null;
   LoadingOrErrorElement: JSX.Element | null;
   NoResultElement: JSX.Element | null;
+  raw: any;
 } & DefaultLister<T> &
   (
     | {
@@ -42,6 +43,7 @@ export function useAsync<T, I>(
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [raw, setRaw] = useState<any>(null);
   const [isInit, setIsInit] = useState(false);
 
   const cb = options?.dependsOn ? useCallback(fx, options?.dependsOn) : fx;
@@ -59,6 +61,7 @@ export function useAsync<T, I>(
 
       try {
         setError(null);
+        setRaw(null);
         setLoading(true);
         setIsInit(true);
 
@@ -66,8 +69,12 @@ export function useAsync<T, I>(
         const result = await addDevelopmentDelay(cb(input));
         if(reqVersionRef.current !== version) return;
 
+        setRaw(result);
+
         if (result && typeof result === 'object') {
-          if ('error' in result) throw new Error(result.error);
+          if ('error' in result) {
+            throw new Error(result.error);
+          }
         }
 
         setValue(result);
@@ -108,6 +115,7 @@ export function useAsync<T, I>(
     loadingOrError: loading || error !== null,
     loading,
     error,
+    raw,
     result: value as T,
     asList: listValue,
     reload,
@@ -144,6 +152,7 @@ export interface AsyncAction<T, U> {
   error: string | null;
   callback(input: U): void;
   result: T | null;
+  raw: any;
   LoadingElement: JSX.Element | null;
   NoResultElement: JSX.Element | null;
 }
@@ -151,6 +160,7 @@ export interface AsyncAction<T, U> {
 export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dependsOn: any[]): AsyncAction<T, U> {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [raw, setRaw] = useState<any>(null);
   const [result, setResult] = useState<T | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -177,10 +187,14 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
     const version = reqVersionRef.current;
 
     try {
+      setRaw(null);
       setError(null);
       setLoading(true);
 
       const actionResult = await addDevelopmentDelay(callback(arg));
+
+      setRaw(actionResult);
+
       if (actionResult && typeof actionResult === 'object' && 'error' in actionResult) {
         throw new Error((actionResult as any).error);
       }
@@ -214,6 +228,7 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
     LoadingElement: LoadingElement || SuccessElement,
     loading,
     error,
+    raw,
     callback: theCallback as (arg: U) => Promise<void>,
     result,
     NoResultElement,

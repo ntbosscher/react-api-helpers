@@ -1,6 +1,6 @@
 {
   "name": "nate-react-api-helpers",
-  "version": "1.10.13",
+  "version": "1.10.14",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
