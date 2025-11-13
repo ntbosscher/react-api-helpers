@@ -1,4 +1,4 @@
-import { ErrResponse } from './Fetcher';
+import { ErrorExt, ErrResponse } from './Fetcher';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Loading } from './Loading';
 import { Grid } from '@mui/material';
@@ -80,6 +80,11 @@ export function useAsync<T, I>(
         setValue(result);
       } catch (e: any) {
         if(reqVersionRef.current !== version) return;
+
+        if("raw" in e) {
+          setRaw(e.raw);
+        }
+
         setError(e.toString());
       }
 
@@ -206,6 +211,10 @@ export function useAsyncAction<T, U = any>(callback: (arg: U) => Promise<T>, dep
       setShowSuccess(true);
     } catch (e: any) {
       if(reqVersionRef.current !== version) return;
+
+      if("raw" in e) {
+        setRaw(e.raw);
+      }
 
       setError(e.toString());
       setLoading(false);

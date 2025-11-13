@@ -1,6 +1,6 @@
 import { addDevelopmentDelay, LoadingEl, NoResultEl } from './AsyncUtils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ErrResponse } from './Fetcher';
+import { ErrorExt, ErrResponse } from './Fetcher';
 
 type CallbackWithInput2<T, I> = (input: I) => Promise<T | ErrResponse>;
 
@@ -52,6 +52,11 @@ export function useAsync2<T, I>(fx: CallbackWithInput2<T, I>, search: I, searchD
     } catch (e: any) {
 
       if(reqVersionRef.current !== version) return;
+
+      if("raw" in e) {
+        setRaw(e.raw);
+      }
+
       setError(e.toString());
     }
 

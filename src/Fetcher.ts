@@ -363,7 +363,7 @@ export class Fetcher {
     const jsonData = await result.json();
 
     if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
-      throw new Error(jsonData.error);
+      throw new ErrorExt(jsonData.error, jsonData);
     }
 
     if (!result.ok) {
@@ -371,6 +371,15 @@ export class Fetcher {
     }
 
     return jsonData as T;
+  }
+}
+
+export class ErrorExt extends Error {
+  raw: any;
+
+  constructor(msg: string, raw: any) {
+    super(msg);
+    this.raw = raw;
   }
 }
 
