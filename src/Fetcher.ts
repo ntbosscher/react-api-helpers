@@ -60,12 +60,17 @@ export class Fetcher {
     return hd;
   }
 
-  async postFormData<T>(path: string, body: { [k: string]: string | Blob }, isRetry: boolean = false): Promise<T> {
+  async postFormData<T>(path: string, body: { [k: string]: string | Blob } | FormData, isRetry: boolean = false): Promise<T> {
     path = this.updatePath(path);
 
-    const fd = new FormData();
-    for (var i in body) {
-      fd.append(i, body[i]);
+    let fd: FormData;
+    if(body && body instanceof FormData) {
+      fd = body;
+    } else {
+      fd = new FormData();
+      for (let i in body) {
+        fd.append(i, body[i]);
+      }
     }
 
     const result = await this.fetch(path, {
