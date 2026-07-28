@@ -3,6 +3,7 @@ export * from './AsyncUtils';
 export * from './AsyncUtils2';
 export * from './Auth';
 export * from './EventEmitter';
+export * from './EventEmitter2';
 export * from './Fetcher';
 export * from './Loading';
 export * from './LoadableButton';
